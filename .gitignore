@@ -1,0 +1,8 @@
+.DS_Store
+*.aux
+*.log
+*.gz
+*.toc
+/cache
+/node_modules
+/out

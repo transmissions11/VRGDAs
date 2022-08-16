@@ -29,6 +29,9 @@ contract TestContract is Test {
     // create range of timestamps
     uint256 constant size = max_days_since_start * step_day_fraction;
 
+    // tolerance of approx equal checks = 0.1%
+    uint256 tolerance = 1e18 / 1000;
+
     function setUp() public {
         astro = new MockLinearASTRO(initialPrice, periodPriceDecrease, perDay);
     }
@@ -39,7 +42,7 @@ contract TestContract is Test {
         uint256 purchasePrice = astro.getPrice(1 days, uint256(perDay / 1e18));
         console.log("initial price: ", initial);
         console.log("purchas price: ", purchasePrice);
-        assertApproxEqAbs(initial, purchasePrice, 100);
+        assertApproxEqRel(initial, purchasePrice, tolerance);
     }
 
     function testFFICorrectnessOne() public {
@@ -102,6 +105,6 @@ contract TestContract is Test {
         uint256 expectedPrice = calculatePrice(_initialPrice, _periodPriceDecrease, _perDay, _timeSinceStart, _sold);
 
         //equal within 0.1%
-        assertApproxEqAbs(actualPrice, expectedPrice, 1);
+        assertApproxEqRel(actualPrice, expectedPrice, tolerance);
     }
 }

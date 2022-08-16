@@ -10,3 +10,4 @@
 **/.idea/
 **/__pychache__
 **/.vscode
+*.pyc

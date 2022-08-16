@@ -8,3 +8,5 @@
 /out
 .idea
 **/.idea/
+**/__pychache__
+**/.vscode

@@ -11,9 +11,9 @@ def main(args):
         pass
 
 def calculate_linear(args):
-    linear_astro = LinearASTRO(args.initial_price / (10 ** 18), args.period_price_decrease / (10 ** 18), args.per_day)
-    price = linear_astro.get_price(args.time_since_start, args.sold)
-    ##convert price to wei 
+    linear_astro = LinearASTRO(args.initial_price / (10 ** 18), args.period_price_decrease / (10 ** 18), args.per_day / (10 ** 18))
+    price = linear_astro.get_price(args.time_since_start / 86400, args.sold)
+    ##convert price to wei
     price *= (10 ** 18)
     enc = encode_single('uint256', int(price))
     ## append 0x for FFI parsing 

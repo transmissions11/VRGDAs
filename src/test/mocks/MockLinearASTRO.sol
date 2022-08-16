@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: Unlicense
-// pragma solidity >=0.8.0;
+pragma solidity >=0.8.0;
 
-// import {LinearASTRO} from "../../LinearASTRO.sol";
+import {LinearASTRO} from "../../LinearASTRO.sol";
+import {ASTRO} from "../../ASTRO.sol";
 
-// contract MockLinearAstro is LinearASTRO {
-//     constructor(
-//         string memory _name,
-//         string memory _symbol,
-//         int256 _initialPrice,
-//         int256 _scaleFactor,
-//         int256 _decayConstant
-//     ) LinearASTRO(_name, _symbol, _initialPrice, _scaleFactor, _decayConstant) {}
-
-//     function tokenURI(uint256) public pure virtual override returns (string memory) {}
-// }
+contract MockLinearASTRO is LinearASTRO {
+    constructor(
+        int256 _initialPrice,
+        int256 periodPriceDecrease,
+        int256 _perDay
+    ) 
+        LinearASTRO(_perDay) 
+        ASTRO(_initialPrice, periodPriceDecrease) 
+    {}
+}

@@ -9,8 +9,8 @@ class Astro(ABC):
 
     def get_price(self, time_since_start, sold):
         t1 = self.initial_price
-        t2 = 1 - period_price_decrease
-        t3 = get_target_day_for_next_sale(sold) - time_since_start
+        t2 = 1 - self.period_price_decrease
+        t3 = time_since_start - self.get_target_day_for_next_sale(sold)
 
         return t1 * math.pow(t2, t3)
 
@@ -18,29 +18,11 @@ class Astro(ABC):
     def get_target_day_for_next_sale(self, sold):
         pass
 
-class Linear(DiscreteGDA):
+class LinearASTRO(Astro):
     
-    def __init__(self, initial_price, decay_constant, scale_factor): 
-        self.initial_price = initial_price
-        self.decay_constant = decay_constant
-        self.scale_factor = scale_factor
+    def __init__(self, initial_price, period_price_decrease, per_day): 
+        super().__init__(initial_price, period_price_decrease)
+        self.per_day = per_day
         
-    def get_cumulative_purchase_price(self, num_total_purchases, time_since_start, quantity):
-        t1 = self.initial_price * math.pow(self.scale_factor, num_total_purchases)
-        t2 = math.pow(self.scale_factor, quantity) - 1
-        t3 = math.exp(self.decay_constant * time_since_start)
-        t4 = self.scale_factor - 1
-        return t1 * t2 / (t3 * t4)
-    
-class ExponentialContinuousGDA(ContinuousGDA): 
-    
-    def __init__(self, initial_price, decay_constant, emission_rate): 
-        self.initial_price = initial_price
-        self.decay_constant = decay_constant
-        self.emission_rate = emission_rate
-        
-    def get_cumulative_purchase_price(self, age_last_available_auction, quantity):
-        t1 = self.initial_price / self.decay_constant
-        t2 = math.exp(self.decay_constant * quantity / self.emission_rate) - 1 
-        t3 = math.exp(self.decay_constant * age_last_available_auction)
-        return t1 * t2 / t3
+    def get_target_day_for_next_sale(self, sold):
+        return sold / self.per_day

@@ -6,4 +6,5 @@
 /cache
 /node_modules
 /out
-*.idea
+.idea
+**/.idea/

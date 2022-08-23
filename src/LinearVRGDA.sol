@@ -5,10 +5,10 @@ import {unsafeWadDiv} from "./utils/SignedWadMath.sol";
 
 import {VRGDA} from "./VRGDA.sol";
 
-/// @title Linear Variable Rate Gradual Dutch Auctions.
+/// @title Linear Variable Rate Gradual Dutch Auctions
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
-/// @notice Abstract VRGDA with a linear issuance curve.
+/// @notice VRGDA with a linear issuance curve.
 abstract contract LinearVRGDA is VRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
@@ -18,6 +18,9 @@ abstract contract LinearVRGDA is VRGDA {
     /// @dev Represented as an 18 decimal fixed point number.
     int256 internal immutable perDay;
 
+    /// @notice Sets pricing parameters for the VRGDA.
+    /// @param _perDay The total number of tokens to
+    /// target selling each day, scaled by 1e18.
     constructor(int256 _perDay) {
         perDay = _perDay;
     }
@@ -26,7 +29,11 @@ abstract contract LinearVRGDA is VRGDA {
                               PRICING LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function getTargetDayForNextSale(int256 sold) internal view virtual override returns (int256) {
+    /// @dev Given a number of tokens sold, return the target day that number of tokens should be sold by.
+    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale day for.
+    /// @return The target day the tokens should be sold by, scaled by 1e18, where the day is
+    /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
+    function getTargetSaleDay(int256 sold) public view virtual override returns (int256) {
         return unsafeWadDiv(sold, perDay);
     }
 }

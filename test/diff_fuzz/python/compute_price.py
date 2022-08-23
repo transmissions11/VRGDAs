@@ -1,12 +1,10 @@
-from LinearVRGDA import VRGDA
+from VRGDA import LinearVRGDA
 from eth_abi import encode_single
 import argparse
 
 def main(args): 
     if (args.type == 'linear'): 
         calculate_linear_vrgda_price(args)
-    # elif (args.type == 'logistic'):
-    #     calculate_pages_price(args)
     
 def calculate_linear_vrgda_price(args): 
     vrgda = LinearVRGDA(
@@ -15,8 +13,8 @@ def calculate_linear_vrgda_price(args):
         args.per_time_unit / (10 ** 18), ## scale decimals 
     )
     price = vrgda.get_price(
-        args.time_since_start / (60 * 60 * 24), ## convert to seconds 
-        args.num_sold
+        args.time_since_start / (10 ** 18), ##scale decimals  
+        args.num_sold + 1 ## price of next item
     )
     price *= (10 ** 18) ## scale up
     encode_and_print(price)
@@ -28,7 +26,7 @@ def encode_and_print(price):
 
 def parse_args(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument("type", choices=["linear", "logistic"])
+    parser.add_argument("type", choices=["linear"])
     parser.add_argument("--time_since_start", type=int)
     parser.add_argument("--num_sold", type=int)
     parser.add_argument("--target_price", type=int)

@@ -9,7 +9,7 @@ import {VRGDA} from "./VRGDA.sol";
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice VRGDA with a logistic issuance curve.
-abstract contract LogisticVRGDA is VRGDA {
+contract LogisticVRGDA is VRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/
@@ -32,7 +32,10 @@ abstract contract LogisticVRGDA is VRGDA {
     /// @notice Sets pricing parameters for the VRGDA.
     /// @param _maxSellable The maximum number of tokens to sell, scaled by 1e18.
     /// @param _timeScale The steepness of the logistic curve, scaled by 1e18.
-    constructor(int256 _maxSellable, int256 _timeScale) {
+
+    constructor(int256 _targetPrice, int256 _priceDecreasePercent, int256 _maxSellable, int256 _timeScale)
+        VRGDA(_targetPrice, _priceDecreasePercent)
+    {
         // Add 1 wad to make the limit inclusive of _maxSellable.
         logisticLimit = _maxSellable + 1e18;
 

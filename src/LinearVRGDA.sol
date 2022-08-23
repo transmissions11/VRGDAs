@@ -9,7 +9,7 @@ import {VRGDA} from "./VRGDA.sol";
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice VRGDA with a linear issuance curve.
-abstract contract LinearVRGDA is VRGDA {
+contract LinearVRGDA is VRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/
@@ -21,7 +21,9 @@ abstract contract LinearVRGDA is VRGDA {
     /// @notice Sets pricing parameters for the VRGDA.
     /// @param _perDay The total number of tokens to
     /// target selling each day, scaled by 1e18.
-    constructor(int256 _perDay) {
+    constructor(int256 _perDay, int256 _targetPrice, int256 _priceDecreasePercent)
+        VRGDA(_targetPrice, _priceDecreasePercent)
+    {
         perDay = _perDay;
     }
 

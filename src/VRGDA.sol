@@ -43,12 +43,20 @@ abstract contract VRGDA {
     function getPrice(uint256 timeSinceStart, uint256 sold) public view returns (uint256) {
         unchecked {
             // prettier-ignore
-            return uint256(wadMul(targetPrice, wadExp(unsafeWadMul(decayConstant,
-                // Theoretically calling toWadUnsafe with timeSinceStart/sold can overflow without
-                // detection, but under any reasonable circumstance they will never be large enough.
-                // Use sold + 1 as ASTRO's n param represents the nth token and sold is the n-1th token.
-                (toWadUnsafe(timeSinceStart) / 1 days) - getTargetSaleDay(toWadUnsafe(sold + 1))
-            ))));
+            return uint256(
+                wadMul(
+                    targetPrice,
+                    wadExp(
+                        unsafeWadMul(
+                            decayConstant,
+                            // Theoretically calling toWadUnsafe with timeSinceStart/sold can overflow without
+                            // detection, but under any reasonable circumstance they will never be large enough.
+                            // Use sold + 1 as ASTRO's n param represents the nth token and sold is the n-1th token.
+                            (toWadUnsafe(timeSinceStart) / 1 days) - getTargetSaleDay(toWadUnsafe(sold + 1))
+                        )
+                    )
+                )
+            );
         }
     }
 

@@ -4,6 +4,7 @@ pragma solidity >=0.8.0;
 /// @title Signed Wad Math
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
+/// @author Remco Bloemen <remco@wicked.ventures>
 /// @notice Efficient signed wad arithmetic.
 
 /// @dev Will not revert on overflow, only use where overflow is not possible.
@@ -37,7 +38,9 @@ function wadMul(int256 x, int256 y) pure returns (int256 r) {
         r := mul(x, y)
 
         // Equivalent to require(x == 0 || (x * y) / x == y)
-        if iszero(or(iszero(x), eq(sdiv(r, x), y))) { revert(0, 0) }
+        if iszero(or(iszero(x), eq(sdiv(r, x), y))) {
+            revert(0, 0)
+        }
 
         // Scale the result down by 1e18.
         r := sdiv(r, 1000000000000000000)
@@ -50,7 +53,9 @@ function wadDiv(int256 x, int256 y) pure returns (int256 r) {
         r := mul(x, 1000000000000000000)
 
         // Equivalent to require(y != 0 && ((x * 1e18) / 1e18 == x))
-        if iszero(and(iszero(iszero(y)), eq(sdiv(r, 1000000000000000000), x))) { revert(0, 0) }
+        if iszero(and(iszero(iszero(y)), eq(sdiv(r, 1000000000000000000), x))) {
+            revert(0, 0)
+        }
 
         // Divide r by y.
         r := sdiv(r, y)
@@ -74,12 +79,12 @@ function wadExp(int256 x) pure returns (int256 r) {
         // x is now in the range (-42, 136) * 1e18. Convert to (-42, 136) * 2**96
         // for more intermediate precision and a binary basis. This base conversion
         // is a multiplication by 1e18 / 2**96 = 5**18 / 2**78.
-        x = (x << 78) / 5 ** 18;
+        x = (x << 78) / 5**18;
 
         // Reduce range of x to (-½ ln 2, ½ ln 2) * 2**96 by factoring out powers
         // of two such that exp(x) = exp(x') * 2**k, where k is an integer.
         // Solving this gives k = round(x / log(2)) and x' = x - k * log(2).
-        int256 k = ((x << 96) / 54916777467707473351141471128 + 2 ** 95) >> 96;
+        int256 k = ((x << 96) / 54916777467707473351141471128 + 2**95) >> 96;
         x = x - k * 54916777467707473351141471128;
 
         // k is in the range [-61, 195].

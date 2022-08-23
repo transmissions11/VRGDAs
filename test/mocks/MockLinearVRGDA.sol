@@ -8,5 +8,5 @@ contract MockLinearVRGDA is LinearVRGDA {
         int256 _targetPrice,
         int256 _priceDecreasePercent,
         int256 _perDay
-    ) VRGDA(_targetPrice, _priceDecreasePercent) LinearVRGDA(_perDay) {}
+    ) LinearVRGDA(_targetPrice, _priceDecreasePercent, _perDay) {}
 }

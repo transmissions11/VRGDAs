@@ -30,9 +30,16 @@ abstract contract LogisticVRGDA is VRGDA {
     int256 internal immutable timeScale;
 
     /// @notice Sets pricing parameters for the VRGDA.
+    /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
+    /// @param _priceDecreasePercent Percent price decrease per unit of time, scaled by 1e18.
     /// @param _maxSellable The maximum number of tokens to sell, scaled by 1e18.
     /// @param _timeScale The steepness of the logistic curve, scaled by 1e18.
-    constructor(int256 _maxSellable, int256 _timeScale) {
+    constructor(
+        int256 _targetPrice,
+        int256 _priceDecreasePercent,
+        int256 _maxSellable,
+        int256 _timeScale
+    ) VRGDA(_targetPrice, _priceDecreasePercent) {
         // Add 1 wad to make the limit inclusive of _maxSellable.
         logisticLimit = _maxSellable + 1e18;
 

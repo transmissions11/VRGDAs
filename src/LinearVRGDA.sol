@@ -19,9 +19,14 @@ abstract contract LinearVRGDA is VRGDA {
     int256 internal immutable perDay;
 
     /// @notice Sets pricing parameters for the VRGDA.
-    /// @param _perDay The total number of tokens to
-    /// target selling each day, scaled by 1e18.
-    constructor(int256 _perDay) {
+    /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
+    /// @param _priceDecreasePercent Percent price decrease per unit of time, scaled by 1e18.
+    /// @param _perDay The total number of tokens to target selling each day, scaled by 1e18.
+    constructor(
+        int256 _targetPrice,
+        int256 _priceDecreasePercent,
+        int256 _perDay
+    ) VRGDA(_targetPrice, _priceDecreasePercent) {
         perDay = _perDay;
     }
 

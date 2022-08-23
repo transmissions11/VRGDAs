@@ -9,5 +9,5 @@ contract MockLogisticVRGDA is LogisticVRGDA {
         int256 _priceDecreasePercent,
         int256 _maxSellable,
         int256 _timeScale
-    ) VRGDA(_targetPrice, _priceDecreasePercent) LogisticVRGDA(_maxSellable, _timeScale) {}
+    ) LogisticVRGDA(_targetPrice, _priceDecreasePercent, _maxSellable, _timeScale) {}
 }

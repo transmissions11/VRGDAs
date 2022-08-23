@@ -4,6 +4,7 @@ pragma solidity >=0.8.0;
 /// @title Signed Wad Math
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
+/// @author Remco Bloemen <remco@wicked.ventures>
 /// @notice Efficient signed wad arithmetic.
 
 /// @dev Will not revert on overflow, only use where overflow is not possible.

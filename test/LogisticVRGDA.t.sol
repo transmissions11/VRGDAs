@@ -3,20 +3,83 @@ pragma solidity 0.8.15;
 
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import {SampleContract} from "../src/SampleContract.sol";
+import {toWadUnsafe} from "../src/utils/SignedWadMath.sol";
 
-contract SampleContractTest is DSTestPlus {
-    SampleContract sampleContract;
+import {MockLogisticVRGDA} from "./mocks/MockLogisticVRGDA.sol";
+
+uint256 constant ONE_THOUSAND_YEARS = 356 days * 1000;
+
+uint256 constant MAX_SELLABLE = 6392;
+
+contract LogisticVRGDATest is DSTestPlus {
+    MockLogisticVRGDA vrgda;
 
     function setUp() public {
-        sampleContract = new SampleContract();
+        vrgda = new MockLogisticVRGDA(
+            69.42e18, // Target price.
+            0.31e18, // Price decrease percent.
+            toWadUnsafe(MAX_SELLABLE), // Max sellable.
+            0.0023e18 // Time scale.
+        );
     }
 
-    function testFunc1() public {
-        sampleContract.func1(1337);
+    function testTargetPrice() public {
+        // Warp to the target sale time so that the VRGDA price equals the target price.
+        hevm.warp(block.timestamp + uint256(vrgda.getTargetSaleTime(1e18) * 1 days) / 1e18);
+
+        uint256 cost = vrgda.getVRGDAPrice(toWadUnsafe(block.timestamp) / 1 days, 0);
+        assertRelApproxEq(cost, uint256(vrgda.targetPrice()), 0.0000001e18);
     }
 
-    function testFunc2() public {
-        sampleContract.func2(1337);
+    function testPricingBasic() public {
+        // Our VRGDA targets this number of mints at given time.
+        uint256 timeDelta = 120 days;
+        uint256 numMint = 876;
+
+        hevm.warp(block.timestamp + timeDelta);
+
+        uint256 cost = vrgda.getVRGDAPrice(toWadUnsafe(block.timestamp) / 1 days, numMint);
+
+        // Equal within 2 percent since num mint is rounded from true decimal amount.
+        assertRelApproxEq(cost, uint256(vrgda.targetPrice()), 0.02e18);
+    }
+
+    function testGetTargetSaleTimeDoesNotRevertEarly() public view {
+        vrgda.getTargetSaleTime(toWadUnsafe(MAX_SELLABLE));
+    }
+
+    function testGetTargetSaleTimeRevertsWhenExpected() public {
+        int256 maxMintablePlusOne = toWadUnsafe(MAX_SELLABLE + 1);
+
+        hevm.expectRevert("UNDEFINED");
+        vrgda.getTargetSaleTime(maxMintablePlusOne);
+    }
+
+    function testNoOverflowForMostTokens(uint256 timeSinceStart, uint256 sold) public {
+        vrgda.getVRGDAPrice(int256(bound(timeSinceStart, 0 days, ONE_THOUSAND_YEARS * 1e18)), bound(sold, 0, 1730));
+    }
+
+    function testNoOverflowForAllTokens(uint256 timeSinceStart, uint256 sold) public {
+        vrgda.getVRGDAPrice(
+            int256(bound(timeSinceStart, 3870 days * 1e18, ONE_THOUSAND_YEARS * 1e18)),
+            bound(sold, 0, 6391)
+        );
+    }
+
+    function testFailOverflowForBeyondLimitTokens(uint256 timeSinceStart, uint256 sold) public {
+        vrgda.getVRGDAPrice(
+            int256(bound(timeSinceStart, 0 days, ONE_THOUSAND_YEARS * 1e18)),
+            bound(sold, 6392, type(uint128).max)
+        );
+    }
+
+    function testAlwaysTargetPriceInRightConditions(uint256 sold) public {
+        sold = bound(sold, 0, MAX_SELLABLE - 1);
+
+        assertRelApproxEq(
+            vrgda.getVRGDAPrice(vrgda.getTargetSaleTime(toWadUnsafe(sold + 1)), sold),
+            uint256(vrgda.targetPrice()),
+            0.00001e18
+        );
     }
 }

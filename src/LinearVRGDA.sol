@@ -3,13 +3,13 @@ pragma solidity >=0.8.0;
 
 import {unsafeWadDiv} from "./utils/SignedWadMath.sol";
 
-import {ASTRO} from "./ASTRO.sol";
+import {VRGDA} from "./VRGDA.sol";
 
-/// @title Linear Arbitrarily Scheduled Transaction Responsive Offers.
+/// @title Linear Variable Rate Gradual Dutch Auctions.
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
-/// @notice Abstract ASTRO with a linear issuance curve.
-abstract contract LinearASTRO is ASTRO {
+/// @notice Abstract VRGDA with a linear issuance curve.
+abstract contract LinearVRGDA is VRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/

@@ -3,13 +3,13 @@ pragma solidity >=0.8.0;
 
 import {wadExp, wadLn, unsafeDiv, unsafeWadDiv} from "./utils/SignedWadMath.sol";
 
-import {ASTRO} from "./ASTRO.sol";
+import {VRGDA} from "./VRGDA.sol";
 
-/// @title Logistic Arbitrarily Scheduled Transaction Responsive Offers.
+/// @title Logistic Variable Rate Gradual Dutch Auctions.
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
-/// @notice Abstract ASTRO with a logistic issuance curve.
-abstract contract LogisticASTRO is ASTRO {
+/// @notice Abstract VRGDA with a logistic issuance curve.
+abstract contract LogisticVRGDA is VRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/

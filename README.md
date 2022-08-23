@@ -1,3 +1,3 @@
-# ASTRO
+# VRGDA
 
-Arbitrarily Scheduled Transaction Responsive Offers.
+Variable Rate Gradual Dutch Auctions.

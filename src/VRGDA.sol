@@ -3,13 +3,13 @@ pragma solidity >=0.8.0;
 
 import {wadExp, wadLn, wadMul, unsafeWadMul, toWadUnsafe} from "./utils/SignedWadMath.sol";
 
-/// @title Arbitrarily Scheduled Transaction Responsive Offers.
+/// @title Variable Rate Gradual Dutch Auctions.
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice Sell tokens roughly according to an issuance schedule.
-abstract contract ASTRO {
+abstract contract VRGDA {
     /*//////////////////////////////////////////////////////////////
-                            ASTRO PARAMETERS
+                            VRGDA PARAMETERS
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Initial price of each token, to be scaled according to sales rate.
@@ -30,7 +30,7 @@ abstract contract ASTRO {
                               PRICING LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Calculate the price of a token according to the ASTRO formula.
+    /// @notice Calculate the price of a token according to the VRGDA formula.
     /// @param timeSinceStart The time since actions began, in seconds.
     /// @param sold The number of tokens that have been sold so far.
     function getPrice(uint256 timeSinceStart, uint256 sold) public view returns (uint256) {
@@ -47,6 +47,6 @@ abstract contract ASTRO {
     /// @dev Given the number of tokens sold so far, return the target day the next token should be sold by.
     /// @param sold The number of tokens that have been sold so far, where 0 means none, scaled by 1e18.
     /// @return The target day that the next token should be sold by, scaled by 1e18, where the day
-    /// is relative, such that 0 means the token should be sold immediately when the ASTRO begins.
+    /// is relative, such that 0 means the token should be sold immediately when the VRGDA begins.
     function getTargetDayForNextSale(int256 sold) internal view virtual returns (int256);
 }

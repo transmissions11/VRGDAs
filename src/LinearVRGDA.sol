@@ -9,7 +9,7 @@ import {VRGDA} from "./VRGDA.sol";
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice VRGDA with a linear issuance curve.
-contract LinearVRGDA is VRGDA {
+abstract contract LinearVRGDA is VRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/

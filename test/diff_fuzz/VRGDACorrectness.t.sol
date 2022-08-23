@@ -32,8 +32,8 @@ contract VRGDACorrectnessTest is DSTestPlus {
         // Convert to wad days for convenience.
         timeSinceStart = (timeSinceStart * 10e18) / 1 days;
 
-        // We wrap this call in a try catch because the getVRGDAPrice is expected to revert when
-        // price overflows. In these cases, we continue campaign
+        // We wrap this call in a try catch because the getVRGDAPrice is expected to revert for
+        // degenerate cases. When this happens, we just continue campaign.
         try vrgda.getVRGDAPrice(int256(timeSinceStart), numSold) returns (uint256 actualPrice) {
             uint256 expectedPrice = calculatePrice(
                 TARGET_PRICE,

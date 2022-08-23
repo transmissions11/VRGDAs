@@ -4,7 +4,6 @@ pragma solidity >=0.8.0;
 /// @title Signed Wad Math
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
-/// @author Remco Bloemen <remco@wicked.ventures>
 /// @notice Efficient signed wad arithmetic.
 
 /// @dev Will not revert on overflow, only use where overflow is not possible.
@@ -66,15 +65,11 @@ function wadExp(int256 x) pure returns (int256 r) {
     unchecked {
         // When the result is < 0.5 we return zero. This happens when
         // x <= floor(log(0.5e18) * 1e18) ~ -42e18
-        if (x <= -42139678854452767551) {
-            return 0;
-        }
+        if (x <= -42139678854452767551) return 0;
 
         // When the result is > (2**255 - 1) / 1e18 we can not represent it as an
         // int. This happens when x >= floor(log((2**255 - 1) / 1e18) * 1e18) ~ 135.
-        if (x >= 135305999368893231589) {
-            revert("EXP_OVERFLOW");
-        }
+        if (x >= 135305999368893231589) revert("EXP_OVERFLOW");
 
         // x is now in the range (-42, 136) * 1e18. Convert to (-42, 136) * 2**96
         // for more intermediate precision and a binary basis. This base conversion

@@ -37,24 +37,24 @@ abstract contract VRGDA {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Calculate the price of a token according to the VRGDA formula.
-    /// @param timeSinceStart The time passed since auctions began, in seconds.
+    /// @param timeSinceStart Total time passed since auctions began, scaled by 1e18.
     /// @param sold The total number of tokens that have been sold so far.
     /// @return The price of a token according to VRGDA, scaled by 1e18.
-    function getPrice(uint256 timeSinceStart, uint256 sold) public view returns (uint256) {
+    function getPrice(int256 timeSinceStart, uint256 sold) public view returns (uint256) {
         unchecked {
             // prettier-ignore
             return uint256(wadMul(targetPrice, wadExp(unsafeWadMul(decayConstant,
-                // Theoretically calling toWadUnsafe with timeSinceStart/sold can overflow without
-                // detection, but under any reasonable circumstance they will never be large enough.
-                // Use sold + 1 as ASTRO's n param represents the nth token and sold is the n-1th token.
-                (toWadUnsafe(timeSinceStart) / 1 days) - getTargetSaleDay(toWadUnsafe(sold + 1))
+                // Theoretically calling toWadUnsafe with sold can silently overflow but under
+                // any reasonable circumstance it will never be large enough. We use sold + 1
+                // as ASTRO's n param represents the nth token and sold is the n-1th token.
+                timeSinceStart - getTargetSaleTime(toWadUnsafe(sold + 1))
             ))));
         }
     }
 
-    /// @dev Given a number of tokens sold, return the target day that number of tokens should be sold by.
-    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale day for.
-    /// @return The target day the tokens should be sold by, scaled by 1e18, where the day is
+    /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
+    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
+    /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getTargetSaleDay(int256 sold) public view virtual returns (int256);
+    function getTargetSaleTime(int256 sold) public view virtual returns (int256);
 }

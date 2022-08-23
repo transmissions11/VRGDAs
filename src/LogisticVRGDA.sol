@@ -53,11 +53,11 @@ abstract contract LogisticVRGDA is VRGDA {
                               PRICING LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    /// @dev Given a number of tokens sold, return the target day that number of tokens should be sold by.
-    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale day for.
-    /// @return The target day the tokens should be sold by, scaled by 1e18, where the day is
+    /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
+    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
+    /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getTargetSaleDay(int256 sold) public view virtual override returns (int256) {
+    function getTargetSaleTime(int256 sold) public view override returns (int256) {
         unchecked {
             return -unsafeWadDiv(wadLn(unsafeDiv(logisticLimitDoubled, sold + logisticLimit) - 1e18), timeScale);
         }

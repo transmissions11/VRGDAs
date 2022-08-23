@@ -1,4 +1,4 @@
-# VRGDAs • [![CI](https://github.com/transmissions11/VRGDAs/actions/workflows/tests.yml/badge.svg)](https://github.com/transmissions11/VRGDAs/actions/workflows/CI.yml)
+# VRGDAs • [![CI](https://github.com/transmissions11/VRGDAs/actions/workflows/tests.yml/badge.svg)](https://github.com/transmissions11/VRGDAs/actions/workflows/tests.yml)
 
 Variable Rate Gradual Dutch Auctions.
 

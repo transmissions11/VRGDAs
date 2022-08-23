@@ -8,11 +8,11 @@ import {MockLinearVRGDA} from "../mocks/MockLinearVRGDA.sol";
 import {toWadUnsafe} from "../../src/utils/SignedWadMath.sol";
 import {console} from "forge-std/console.sol";
 
-// Differentially fuzz VRGDA solidity implementation against python reference 
+// Differentially fuzz VRGDA solidity implementation against python reference
 contract VRGDACorrectnessTest is DSTestPlus {
     using LibString for uint256;
 
-    // sample parameters for differential fuzzing campaign 
+    // sample parameters for differential fuzzing campaign
     uint256 immutable MAX_TIMEFRAME = 356 days * 10;
     uint256 immutable MAX_SELLABLE = 10000;
     int256 immutable TARGET_PRICE = 69.42e18;
@@ -22,32 +22,27 @@ contract VRGDACorrectnessTest is DSTestPlus {
     MockLinearVRGDA vrgda;
 
     function setUp() public {
-        vrgda = new MockLinearVRGDA(
-            TARGET_PRICE, 
-            PRICE_DECREASE_PERCENT,
-            PER_UNIT_TIME
-        );
+        vrgda = new MockLinearVRGDA(TARGET_PRICE, PRICE_DECREASE_PERCENT, PER_UNIT_TIME);
     }
 
     function testFFICorrectness(uint256 timeSinceStart, uint256 numSold) public {
-        // Bound fuzzer inputs to acceptable contraints. 
+        // Bound fuzzer inputs to acceptable contraints.
         numSold = bound(numSold, 0, MAX_SELLABLE);
         timeSinceStart = bound(timeSinceStart, 0, MAX_TIMEFRAME);
         // Convert to wad days for convenience.
-        timeSinceStart = timeSinceStart * 10e18 / 1 days;
+        timeSinceStart = (timeSinceStart * 10e18) / 1 days;
 
-        // We wrap this call in a try catch because the getVRGDAPrice is expected to revert when 
+        // We wrap this call in a try catch because the getVRGDAPrice is expected to revert when
         // price overflows. In these cases, we continue campaign
         try vrgda.getVRGDAPrice(int256(timeSinceStart), numSold) returns (uint256 actualPrice) {
             uint256 expectedPrice = calculatePrice(
                 TARGET_PRICE,
                 PRICE_DECREASE_PERCENT,
                 PER_UNIT_TIME,
-                timeSinceStart, 
+                timeSinceStart,
                 numSold
             );
             assertRelApproxEq(expectedPrice, actualPrice, 0.00001e18);
-
         } catch {}
     }
 

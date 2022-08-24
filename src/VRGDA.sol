@@ -45,8 +45,8 @@ abstract contract VRGDA {
             // prettier-ignore
             return uint256(wadMul(targetPrice, wadExp(unsafeWadMul(decayConstant,
                 // Theoretically calling toWadUnsafe with sold can silently overflow but under
-                // any reasonable circumstance it will never be large enough. We use sold + 1
-                // as ASTRO's n param represents the nth token and sold is the n-1th token.
+                // any reasonable circumstance it will never be large enough. We use sold + 1 as
+                // the VRGDA formula's n param represents the nth token and sold is the n-1th token.
                 timeSinceStart - getTargetSaleTime(toWadUnsafe(sold + 1))
             ))));
         }

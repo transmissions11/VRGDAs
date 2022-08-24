@@ -7,7 +7,7 @@ import {LogisticNFT} from "../src/examples/LogisticNFT.sol";
 
 bytes constant UNDERFLOW = abi.encodeWithSignature("Panic(uint256)", 0x11);
 
-contract LogisticVRGDATest is DSTestPlus {
+contract LogisticNFTTest is DSTestPlus {
     LogisticNFT nft;
 
     function setUp() public {
@@ -18,7 +18,7 @@ contract LogisticVRGDATest is DSTestPlus {
         nft.mint{value: 74.712774e18}();
 
         assertEq(nft.balanceOf(address(this)), 1);
-        assertEq(nft.ownerOf(1), address(this));
+        assertEq(nft.ownerOf(0), address(this));
     }
 
     function testCannotUnderpayForNFTMint() public {
@@ -33,7 +33,7 @@ contract LogisticVRGDATest is DSTestPlus {
 
         assertEq(nft.balanceOf(address(this)), nft.MAX_MINTABLE());
         for (uint256 i = 0; i < nft.MAX_MINTABLE(); i++) {
-            assertEq(nft.ownerOf(i + 1), address(this));
+            assertEq(nft.ownerOf(i), address(this));
         }
     }
 

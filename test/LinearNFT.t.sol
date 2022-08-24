@@ -7,7 +7,7 @@ import {LinearNFT} from "../src/examples/LinearNFT.sol";
 
 bytes constant UNDERFLOW = abi.encodeWithSignature("Panic(uint256)", 0x11);
 
-contract LinearVRGDATest is DSTestPlus {
+contract LinearNFTTest is DSTestPlus {
     LinearNFT nft;
 
     function setUp() public {
@@ -18,7 +18,7 @@ contract LinearVRGDATest is DSTestPlus {
         nft.mint{value: 83.571504e18}();
 
         assertEq(nft.balanceOf(address(this)), 1);
-        assertEq(nft.ownerOf(1), address(this));
+        assertEq(nft.ownerOf(0), address(this));
     }
 
     function testCannotUnderpayForNFTMint() public {
@@ -33,7 +33,7 @@ contract LinearVRGDATest is DSTestPlus {
 
         assertEq(nft.balanceOf(address(this)), 100);
         for (uint256 i = 0; i < 100; i++) {
-            assertEq(nft.ownerOf(i + 1), address(this));
+            assertEq(nft.ownerOf(i), address(this));
         }
     }
 

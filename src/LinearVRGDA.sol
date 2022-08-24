@@ -5,7 +5,7 @@ import {unsafeWadDiv} from "./utils/SignedWadMath.sol";
 
 import {VRGDA} from "./VRGDA.sol";
 
-/// @title Linear Variable Rate Gradual Dutch Auctions
+/// @title Linear Variable Rate Gradual Dutch Auction
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice VRGDA with a linear issuance curve.

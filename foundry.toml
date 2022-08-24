@@ -12,4 +12,4 @@ no_match_test = "FFI"
 ffi = true
 match_test = "FFI"
 no_match_test = "a^"
-fuzz_runs = 100
+fuzz_runs = 1000

@@ -20,13 +20,13 @@ abstract contract LinearVRGDA is VRGDA {
 
     /// @notice Sets pricing parameters for the VRGDA.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
-    /// @param _priceDecreasePercent Percent price decrease per unit of time, scaled by 1e18.
+    /// @param _priceDecayPercent The percent price decays per unit of time with no sales, scaled by 1e18.
     /// @param _perTimeUnit The number of tokens to target selling in 1 full unit of time, scaled by 1e18.
     constructor(
         int256 _targetPrice,
-        int256 _priceDecreasePercent,
+        int256 _priceDecayPercent,
         int256 _perTimeUnit
-    ) VRGDA(_targetPrice, _priceDecreasePercent) {
+    ) VRGDA(_targetPrice, _priceDecayPercent) {
         perTimeUnit = _perTimeUnit;
     }
 

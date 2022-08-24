@@ -22,11 +22,11 @@ abstract contract VRGDA {
 
     /// @notice Sets target price and per period price decrease for the VRGDA.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
-    /// @param _priceDecreasePercent Percent price decrease per unit of time, scaled by 1e18.
-    constructor(int256 _targetPrice, int256 _priceDecreasePercent) {
+    /// @param _priceDecayPercent The percent price decays per unit of time with no sales, scaled by 1e18.
+    constructor(int256 _targetPrice, int256 _priceDecayPercent) {
         targetPrice = _targetPrice;
 
-        decayConstant = wadLn(1e18 - _priceDecreasePercent);
+        decayConstant = wadLn(1e18 - _priceDecayPercent);
 
         // The decay constant must be negative for VRGDAs to work.
         require(decayConstant < 0, "NON_NEGATIVE_DECAY_CONSTANT");

@@ -41,15 +41,18 @@ contract LinearNFT is ERC721, LinearVRGDA {
 
     function mint() external payable returns (uint256 mintedId) {
         // Note: By using toDaysWadUnsafe(block.timestamp) we are establishing that 1 "unit of time" is 1 day.
-        // Ensure the caller has sent enough ETH to pay for the price of an NFT according to the VRGDA.
         uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp), mintedId = totalSold++);
+
+        require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 
         _mint(msg.sender, mintedId); // Mint the NFT using mintedId.
 
-        // Note: We do this at the end to avoid creating a reentrancy vector.
-        // Refund the user any ETH they spent over the current price of the NFT.
-        // No need to check msg.value >= price, it'll just revert due to underflow.
-        SafeTransferLib.safeTransferETH(msg.sender, msg.value - price);
+        unchecked {
+            // Note: We do this at the end to avoid creating a reentrancy vector.
+            // Refund the user any ETH they spent over the current price of the NFT.
+            // Unchecked is safe here because we validate msg.value >= price above.
+            SafeTransferLib.safeTransferETH(msg.sender, msg.value - price);
+        }
     }
 
     /*//////////////////////////////////////////////////////////////

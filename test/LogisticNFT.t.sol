@@ -5,8 +5,6 @@ import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
 import {LogisticNFT} from "../src/examples/LogisticNFT.sol";
 
-bytes constant UNDERFLOW = abi.encodeWithSignature("Panic(uint256)", 0x11);
-
 contract LogisticNFTTest is DSTestPlus {
     LogisticNFT nft;
 
@@ -22,7 +20,7 @@ contract LogisticNFTTest is DSTestPlus {
     }
 
     function testCannotUnderpayForNFTMint() public {
-        hevm.expectRevert(UNDERFLOW);
+        hevm.expectRevert("UNDERPAID");
         nft.mint{value: 73.712774e18}();
     }
 

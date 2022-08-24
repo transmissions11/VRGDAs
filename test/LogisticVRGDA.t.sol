@@ -3,7 +3,7 @@ pragma solidity 0.8.15;
 
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import {toWadUnsafe} from "../src/utils/SignedWadMath.sol";
+import {toWadUnsafe, toDaysWadUnsafe, fromDaysWadUnsafe} from "../src/utils/SignedWadMath.sol";
 
 import {MockLogisticVRGDA} from "./mocks/MockLogisticVRGDA.sol";
 
@@ -17,7 +17,7 @@ contract LogisticVRGDATest is DSTestPlus {
     function setUp() public {
         vrgda = new MockLogisticVRGDA(
             69.42e18, // Target price.
-            0.31e18, // Price decrease percent.
+            0.31e18, // Price decay percent.
             toWadUnsafe(MAX_SELLABLE), // Max sellable.
             0.0023e18 // Time scale.
         );
@@ -25,9 +25,9 @@ contract LogisticVRGDATest is DSTestPlus {
 
     function testTargetPrice() public {
         // Warp to the target sale time so that the VRGDA price equals the target price.
-        hevm.warp(block.timestamp + uint256(vrgda.getTargetSaleTime(1e18) * 1 days) / 1e18);
+        hevm.warp(block.timestamp + fromDaysWadUnsafe(vrgda.getTargetSaleTime(1e18)));
 
-        uint256 cost = vrgda.getVRGDAPrice(toWadUnsafe(block.timestamp) / 1 days, 0);
+        uint256 cost = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp), 0);
         assertRelApproxEq(cost, uint256(vrgda.targetPrice()), 0.0000001e18);
     }
 
@@ -38,7 +38,7 @@ contract LogisticVRGDATest is DSTestPlus {
 
         hevm.warp(block.timestamp + timeDelta);
 
-        uint256 cost = vrgda.getVRGDAPrice(toWadUnsafe(block.timestamp) / 1 days, numMint);
+        uint256 cost = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp), numMint);
 
         // Equal within 2 percent since num mint is rounded from true decimal amount.
         assertRelApproxEq(cost, uint256(vrgda.targetPrice()), 0.02e18);

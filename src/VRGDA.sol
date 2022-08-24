@@ -20,7 +20,7 @@ abstract contract VRGDA {
     /// @dev Represented as an 18 decimal fixed point number.
     int256 internal immutable decayConstant;
 
-    /// @notice Sets target price and per period price decrease for the VRGDA.
+    /// @notice Sets target price and per time unit price decay for the VRGDA.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
     /// @param _priceDecayPercent The percent price decays per unit of time with no sales, scaled by 1e18.
     constructor(int256 _targetPrice, int256 _priceDecayPercent) {

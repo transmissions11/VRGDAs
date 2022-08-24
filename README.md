@@ -1,6 +1,6 @@
 # VRGDAs • [![CI](https://github.com/transmissions11/VRGDAs/actions/workflows/tests.yml/badge.svg)](https://github.com/transmissions11/VRGDAs/actions/workflows/tests.yml)
 
-Variable Rate Gradual Dutch Auctions.
+Variable Rate Gradual Dutch Auctions. Read the [whitepaper here](https://www.paradigm.xyz/2022/08/vrgda).
 
 ## Contributing
 

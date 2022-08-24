@@ -3,14 +3,17 @@ pragma solidity 0.8.15;
 
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import {LibString} from "../utils/LibString.sol";
 import {MockLinearVRGDA} from "../mocks/MockLinearVRGDA.sol";
 import {toWadUnsafe} from "../../src/utils/SignedWadMath.sol";
 import {console} from "forge-std/console.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 // Differentially fuzz VRGDA solidity implementation against python reference
 contract VRGDACorrectnessTest is DSTestPlus {
-    using LibString for uint256;
+
+    //instantiate vm 
+    address private constant VM_ADDRESS = address(bytes20(uint160(uint256(keccak256("hevm cheat code")))));
+    Vm public constant vm = Vm(VM_ADDRESS);
 
     // sample parameters for differential fuzzing campaign
     uint256 immutable MAX_TIMEFRAME = 356 days * 10;
@@ -25,12 +28,38 @@ contract VRGDACorrectnessTest is DSTestPlus {
         vrgda = new MockLinearVRGDA(TARGET_PRICE, PRICE_DECREASE_PERCENT, PER_UNIT_TIME);
     }
 
-    function testFFICorrectness(uint256 timeSinceStart, uint256 numSold) public {
+    // test correctness of implementation for a single input, as a sanity check
+    function testFFICorrectness() public {
+        // 10 days in wads
+        uint256 timeSinceStart = 10 * 1e18;
+        // number sold, slightly ahead of schedule
+        uint256 numSold = 25;
+
+        uint256 actualPrice = vrgda.getVRGDAPrice(int256(timeSinceStart), numSold);
+        uint256 expectedPrice = calculatePrice(
+                TARGET_PRICE,
+                PRICE_DECREASE_PERCENT,
+                PER_UNIT_TIME,
+                timeSinceStart,
+                numSold
+            );
+
+        console.log("actual price", actualPrice);
+        console.log("expected price", expectedPrice);
+        //check approximate equality 
+        assertRelApproxEq(expectedPrice, actualPrice, 0.00001e18);
+        // sanity check that prices are greater than zero 
+        assertGt(actualPrice, 0);
+    }
+
+
+    // fuzz to test correctness against multiple inputs 
+    function testFFICorrectnessFuzz(uint256 timeSinceStart, uint256 numSold) public {
         // Bound fuzzer inputs to acceptable contraints.
         numSold = bound(numSold, 0, MAX_SELLABLE);
         timeSinceStart = bound(timeSinceStart, 0, MAX_TIMEFRAME);
         // Convert to wad days for convenience.
-        timeSinceStart = (timeSinceStart * 10e18) / 1 days;
+        timeSinceStart = timeSinceStart * 1e18 / 1 days;
 
         // We wrap this call in a try catch because the getVRGDAPrice is expected to revert for
         // degenerate cases. When this happens, we just continue campaign.
@@ -42,9 +71,13 @@ contract VRGDACorrectnessTest is DSTestPlus {
                 timeSinceStart,
                 numSold
             );
+            if (expectedPrice < 0.0000001e18) return; // For really small prices, we expect divergence, so we skip
             assertRelApproxEq(expectedPrice, actualPrice, 0.00001e18);
         } catch {}
     }
+
+
+
 
     // ffi call
     function calculatePrice(
@@ -59,16 +92,16 @@ contract VRGDACorrectnessTest is DSTestPlus {
         inputs[1] = "test/diff_fuzz/python/compute_price.py";
         inputs[2] = "linear";
         inputs[3] = "--time_since_start";
-        inputs[4] = _timeSinceStart.toString();
+        inputs[4] = vm.toString(_timeSinceStart);
         inputs[5] = "--num_sold";
-        inputs[6] = _numSold.toString();
+        inputs[6] = vm.toString(_numSold);
         inputs[7] = "--target_price";
-        inputs[8] = uint256(_targetPrice).toString();
+        inputs[8] = vm.toString(uint256(_targetPrice));
         inputs[9] = "--price_decrease_percent";
-        inputs[10] = uint256(_priceDecreasePercent).toString();
+        inputs[10] = vm.toString(uint256(_priceDecreasePercent));
         inputs[11] = "--per_time_unit";
-        inputs[12] = uint256(_perUnitTime).toString();
+        inputs[12] = vm.toString(uint256(_perUnitTime));
 
-        return abi.decode(hevm.ffi(inputs), (uint256));
+        return abi.decode(vm.ffi(inputs), (uint256));
     }
 }

@@ -4,8 +4,9 @@ pragma solidity >=0.8.0;
 import {ERC721} from "solmate/tokens/ERC721.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
-import {LogisticVRGDA} from "../LogisticVRGDA.sol";
 import {toDaysWadUnsafe, toWadUnsafe} from "../utils/SignedWadMath.sol";
+
+import {LogisticVRGDA} from "../LogisticVRGDA.sol";
 
 /// @title Logistic VRGDA NFT
 /// @author transmissions11 <t11s@paradigm.xyz>

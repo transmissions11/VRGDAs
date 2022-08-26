@@ -8,14 +8,10 @@ import {toWadUnsafe} from "../../src/utils/SignedWadMath.sol";
 import {console} from "forge-std/console.sol";
 import {Vm} from "forge-std/Vm.sol";
 
-// Differentially fuzz VRGDA solidity implementation against python reference
-contract VRGDACorrectnessTest is DSTestPlus {
+contract LinearVRGDACorrectnessTest is DSTestPlus {
+    Vm public constant vm = Vm(address(hevm));
 
-    //instantiate vm 
-    address private constant VM_ADDRESS = address(bytes20(uint160(uint256(keccak256("hevm cheat code")))));
-    Vm public constant vm = Vm(VM_ADDRESS);
-
-    // sample parameters for differential fuzzing campaign
+    // Sample parameters for differential fuzzing campaign.
     uint256 immutable MAX_TIMEFRAME = 356 days * 10;
     uint256 immutable MAX_SELLABLE = 10000;
     int256 immutable TARGET_PRICE = 69.42e18;
@@ -28,41 +24,43 @@ contract VRGDACorrectnessTest is DSTestPlus {
         vrgda = new MockLinearVRGDA(TARGET_PRICE, PRICE_DECREASE_PERCENT, PER_UNIT_TIME);
     }
 
-    // test correctness of implementation for a single input, as a sanity check
     function testFFICorrectness() public {
-        // 10 days in wads
-        uint256 timeSinceStart = 10 * 1e18;
-        // number sold, slightly ahead of schedule
+        // 10 days in wads.
+        uint256 timeSinceStart = 10e18;
+
+        // Number sold, slightly ahead of schedule.
         uint256 numSold = 25;
 
         uint256 actualPrice = vrgda.getVRGDAPrice(int256(timeSinceStart), numSold);
         uint256 expectedPrice = calculatePrice(
-                TARGET_PRICE,
-                PRICE_DECREASE_PERCENT,
-                PER_UNIT_TIME,
-                timeSinceStart,
-                numSold
-            );
+            TARGET_PRICE,
+            PRICE_DECREASE_PERCENT,
+            PER_UNIT_TIME,
+            timeSinceStart,
+            numSold
+        );
 
         console.log("actual price", actualPrice);
         console.log("expected price", expectedPrice);
-        //check approximate equality 
+
+        // Check approximate equality.
         assertRelApproxEq(expectedPrice, actualPrice, 0.00001e18);
-        // sanity check that prices are greater than zero 
+
+        // Sanity check that prices are greater than zero.
         assertGt(actualPrice, 0);
     }
 
-
-    // fuzz to test correctness against multiple inputs 
+    // fuzz to test correctness against multiple inputs
     function testFFICorrectnessFuzz(uint256 timeSinceStart, uint256 numSold) public {
-        // Bound fuzzer inputs to acceptable contraints.
+        // Bound fuzzer inputs to acceptable ranges.
         numSold = bound(numSold, 0, MAX_SELLABLE);
         timeSinceStart = bound(timeSinceStart, 0, MAX_TIMEFRAME);
-        // Convert to wad days for convenience.
-        timeSinceStart = timeSinceStart * 1e18 / 1 days;
 
-        // We wrap this call in a try catch because the getVRGDAPrice is expected to revert for
-        // degenerate cases. When this happens, we just continue campaign.
+        // Convert to wad days for convenience.
+        timeSinceStart = (timeSinceStart * 1e18) / 1 days;
+
+        // We wrap this call in a try catch because the getVRGDAPrice is expected to
+        // revert for degenerate cases. When this happens, we just continue campaign.
         try vrgda.getVRGDAPrice(int256(timeSinceStart), numSold) returns (uint256 actualPrice) {
             uint256 expectedPrice = calculatePrice(
                 TARGET_PRICE,
@@ -71,15 +69,13 @@ contract VRGDACorrectnessTest is DSTestPlus {
                 timeSinceStart,
                 numSold
             );
-            if (expectedPrice < 0.0000001e18) return; // For really small prices, we expect divergence, so we skip
+
+            if (expectedPrice < 0.0000001e18) return; // For really small prices, we expect divergence, so we skip.
+
             assertRelApproxEq(expectedPrice, actualPrice, 0.00001e18);
         } catch {}
     }
 
-
-
-
-    // ffi call
     function calculatePrice(
         int256 _targetPrice,
         int256 _priceDecreasePercent,

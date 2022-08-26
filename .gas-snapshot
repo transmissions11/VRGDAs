@@ -13,6 +13,6 @@ LogisticVRGDATest:testFailOverflowForBeyondLimitTokens(uint256,uint256) (runs: 2
 LogisticVRGDATest:testGetTargetSaleTimeDoesNotRevertEarly() (gas: 6147)
 LogisticVRGDATest:testGetTargetSaleTimeRevertsWhenExpected() (gas: 8533)
 LogisticVRGDATest:testNoOverflowForAllTokens(uint256,uint256) (runs: 256, μ: 11229, ~: 11229)
-LogisticVRGDATest:testNoOverflowForMostTokens(uint256,uint256) (runs: 256, μ: 11402, ~: 11528)
+LogisticVRGDATest:testNoOverflowForMostTokens(uint256,uint256) (runs: 256, μ: 11408, ~: 11528)
 LogisticVRGDATest:testPricingBasic() (gas: 10762)
 LogisticVRGDATest:testTargetPrice() (gas: 12246)

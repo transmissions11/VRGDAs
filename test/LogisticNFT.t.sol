@@ -13,7 +13,7 @@ contract LogisticNFTTest is DSTestPlus {
     }
 
     function testMintNFT() public {
-        nft.mint{value: 74.712774e18}();
+        nft.mint{value: 74.713094276091397864e18}();
 
         assertEq(nft.balanceOf(address(this)), 1);
         assertEq(nft.ownerOf(0), address(this));
@@ -21,7 +21,7 @@ contract LogisticNFTTest is DSTestPlus {
 
     function testCannotUnderpayForNFTMint() public {
         hevm.expectRevert("UNDERPAID");
-        nft.mint{value: 73.712774e18}();
+        nft.mint{value: 74e18}();
     }
 
     function testMintAllNFT() public {

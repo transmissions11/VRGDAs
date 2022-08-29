@@ -18,7 +18,9 @@ contract LinearNFT is ERC721, LinearVRGDA {
                               SALES STORAGE
     //////////////////////////////////////////////////////////////*/
 
-    uint256 public totalSold; // Total number of tokens sold so far.
+    uint256 public totalSold; // The total number of tokens sold so far.
+    
+    uint256 public startTime = block.timestamp; // When VRGDA sales begun.
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -41,8 +43,8 @@ contract LinearNFT is ERC721, LinearVRGDA {
     //////////////////////////////////////////////////////////////*/
 
     function mint() external payable returns (uint256 mintedId) {
-        // Note: By using toDaysWadUnsafe(block.timestamp) we are establishing that 1 "unit of time" is 1 day.
-        uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp), mintedId = totalSold++);
+        // Note: By using toDaysWadUnsafe(startTime - block.timestamp) we are establishing that 1 "unit of time" is 1 day.
+        uint256 price = getVRGDAPrice(toDaysWadUnsafe(startTime - block.timestamp), mintedId = totalSold++);
 
         require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

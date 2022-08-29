@@ -13,7 +13,7 @@ contract LinearNFTTest is DSTestPlus {
     }
 
     function testMintNFT() public {
-        nft.mint{value: 83.571504e18}();
+        nft.mint{value: 83.571859212140979125e18}();
 
         assertEq(nft.balanceOf(address(this)), 1);
         assertEq(nft.ownerOf(0), address(this));
@@ -21,7 +21,7 @@ contract LinearNFTTest is DSTestPlus {
 
     function testCannotUnderpayForNFTMint() public {
         hevm.expectRevert("UNDERPAID");
-        nft.mint{value: 82.571504e18}();
+        nft.mint{value: 83e18}();
     }
 
     function testMintManyNFT() public {

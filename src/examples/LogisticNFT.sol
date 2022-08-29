@@ -25,7 +25,7 @@ contract LogisticNFT is ERC721, LogisticVRGDA {
     //////////////////////////////////////////////////////////////*/
 
     uint256 public totalSold; // The total number of tokens sold so far.
-    
+
     uint256 public startTime = block.timestamp; // When VRGDA sales begun.
 
     /*//////////////////////////////////////////////////////////////

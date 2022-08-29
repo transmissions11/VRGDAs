@@ -19,7 +19,7 @@ contract LinearNFT is ERC721, LinearVRGDA {
     //////////////////////////////////////////////////////////////*/
 
     uint256 public totalSold; // The total number of tokens sold so far.
-    
+
     uint256 public startTime = block.timestamp; // When VRGDA sales begun.
 
     /*//////////////////////////////////////////////////////////////

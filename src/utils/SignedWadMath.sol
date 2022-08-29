@@ -149,14 +149,23 @@ function wadLn(int256 x) pure returns (int256 r) {
         // and add ln(2**96 / 10**18) at the end.
 
         assembly {
-            r := shl(7, lt(0xffffffffffffffffffffffffffffffff, x))
-            r := or(r, shl(6, lt(0xffffffffffffffff, shr(r, x))))
-            r := or(r, shl(5, lt(0xffffffff, shr(r, x))))
-            r := or(r, shl(4, lt(0xffff, shr(r, x))))
-            r := or(r, shl(3, lt(0xff, shr(r, x))))
-            r := or(r, shl(2, lt(0xf, shr(r, x))))
-            r := or(r, shl(1, lt(0x3, shr(r, x))))
-            r := or(r, lt(0x1, shr(r, x)))
+            let v := x
+            r := shl(7, lt(0xffffffffffffffffffffffffffffffff, v))
+            r := or(r, shl(6, lt(0xffffffffffffffff, shr(r, v))))
+            r := or(r, shl(5, lt(0xffffffff, shr(r, v))))
+
+            // For the remaining 32 bits, use a De Bruijn lookup.
+            // See: https://graphics.stanford.edu/~seander/bithacks.html
+            v := shr(r, v)
+            v := or(v, shr(1, v))
+            v := or(v, shr(2, v))
+            v := or(v, shr(4, v))
+            v := or(v, shr(8, v))
+            v := or(v, shr(16, v))
+
+            // prettier-ignore
+            r := or(r, byte(and(31, shr(27, mul(v, 0x07c4acdd))), 
+                0x0009010a0d15021d0b0e10121619031e080c141c0f111807131b17061a05041f))
         }
 
         // Reduce range of x to (1, 2) * 2**96

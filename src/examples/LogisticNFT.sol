@@ -54,8 +54,12 @@ contract LogisticNFT is ERC721, LogisticVRGDA {
         // Note: We don't need to check totalSold < MAX_MINTABLE, because getVRGDAPrice will
         // revert if we're over the max mintable limit we set when constructing LogisticVRGDA.
 
-        // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-        uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+        uint256 price;
+
+        unchecked {
+            // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
+            price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+        }
 
         require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

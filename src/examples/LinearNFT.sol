@@ -43,8 +43,12 @@ contract LinearNFT is ERC721, LinearVRGDA {
     //////////////////////////////////////////////////////////////*/
 
     function mint() external payable returns (uint256 mintedId) {
-        // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-        uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+        uint256 price;
+
+        unchecked {
+            // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
+            price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+        }
 
         require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

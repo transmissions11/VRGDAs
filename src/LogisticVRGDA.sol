@@ -18,16 +18,19 @@ abstract contract LogisticVRGDA is VRGDA {
     /// 1 because the logistic function will never fully reach its limit.
     /// @dev Represented as an 18 decimal fixed point number.
     int256 public immutable logisticLimit;
+    mapping(uint256 => int256) public logisticLimits;
 
     /// @dev The maximum number of tokens of tokens to sell + 1 multiplied
     /// by 2. We could compute it on the fly each time but this saves gas.
     /// @dev Represented as a 36 decimal fixed point number.
     int256 public immutable logisticLimitDoubled;
+    mapping(uint256 => int256) public logisticLimitDoubles;
 
     /// @dev Time scale controls the steepness of the logistic curve,
     /// which affects how quickly we will reach the curve's asymptote.
     /// @dev Represented as an 18 decimal fixed point number.
     int256 internal immutable timeScale;
+    mapping(uint256 => int256) public timeScales;
 
     /// @notice Sets pricing parameters for the VRGDA.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
@@ -49,6 +52,25 @@ abstract contract LogisticVRGDA is VRGDA {
         timeScale = _timeScale;
     }
 
+    function createLogisticVRGDA(
+        int256 _targetPrice,
+        int256 _priceDecayPercent,
+        int256 _maxSellable,
+        int256 _timeScale
+    ) public returns (uint256 varId) {
+        varId = varCounter;
+        
+        // Add 1 wad to make the limit inclusive of _maxSellable.
+        logisticLimits[varCounter] = _maxSellable + 1e18;
+
+        // Scale by 2e18 to both double it and give it 36 decimals.
+        logisticLimitDoubles[varCounter] = logisticLimits[varCounter] * 2e18;
+
+        timeScales[varCounter] = _timeScale;
+
+        createVRGDA(_targetPrice, _priceDecayPercent);
+    }
+
     /*//////////////////////////////////////////////////////////////
                               PRICING LOGIC
     //////////////////////////////////////////////////////////////*/
@@ -60,6 +82,12 @@ abstract contract LogisticVRGDA is VRGDA {
     function getTargetSaleTime(int256 sold) public view override returns (int256) {
         unchecked {
             return -unsafeWadDiv(wadLn(unsafeDiv(logisticLimitDoubled, sold + logisticLimit) - 1e18), timeScale);
+        }
+    }
+
+    function getTargetSaleTime(uint256 varId, int256 sold) public view override returns (int256) {
+        unchecked {
+            return -unsafeWadDiv(wadLn(unsafeDiv(logisticLimitDoubles[varId], sold + logisticLimits[varId]) - 1e18), timeScales[varId]);
         }
     }
 }

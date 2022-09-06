@@ -18,6 +18,8 @@ abstract contract LinearVRGDA is VRGDA {
     /// @dev Represented as an 18 decimal fixed point number.
     int256 internal immutable perTimeUnit;
 
+    mapping(uint256 => int256) internal perTimeUnits;
+
     /// @notice Sets pricing parameters for the VRGDA.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
     /// @param _priceDecayPercent The percent price decays per unit of time with no sales, scaled by 1e18.
@@ -30,6 +32,16 @@ abstract contract LinearVRGDA is VRGDA {
         perTimeUnit = _perTimeUnit;
     }
 
+    function createLinearVRGDA(
+        int256 _targetPrice,
+        int256 _priceDecayPercent,
+        int256 _perTimeUnit
+    ) public returns (uint256 varId) {
+        varId = varCounter;
+        perTimeUnits[varCounter] = _perTimeUnit;
+        createVRGDA(_targetPrice, _priceDecayPercent);
+    }
+
     /*//////////////////////////////////////////////////////////////
                               PRICING LOGIC
     //////////////////////////////////////////////////////////////*/
@@ -40,5 +52,9 @@ abstract contract LinearVRGDA is VRGDA {
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
     function getTargetSaleTime(int256 sold) public view override returns (int256) {
         return unsafeWadDiv(sold, perTimeUnit);
+    }
+
+    function getTargetSaleTime(uint256 varId, int256 sold) public view override returns (int256) {
+        return unsafeWadDiv(sold, perTimeUnits[varId]);
     }
 }

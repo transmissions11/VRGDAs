@@ -7,41 +7,32 @@ import {VRGDALibrary} from "./lib/VRGDALibrary.sol";
 /// @title Variable Rate Gradual Dutch Auction
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
+/// @author saucepoint
 /// @notice Sell tokens roughly according to an issuance schedule.
-abstract contract VRGDA {
+abstract contract MultiVRGDA {
     /*//////////////////////////////////////////////////////////////
                             VRGDA PARAMETERS
     //////////////////////////////////////////////////////////////*/
-    uint256 varCounter;
+    uint256 public varCounter;
 
     /// @notice Target price for a token, to be scaled according to sales pace.
     /// @dev Represented as an 18 decimal fixed point number.
-    int256 public immutable targetPrice;
+    // maps variable Id to target price
+    mapping(uint256 => int256) public targetPrice;
 
     /// @dev Precomputed constant that allows us to rewrite a pow() as an exp().
     /// @dev Represented as an 18 decimal fixed point number.
-    int256 internal immutable decayConstant;
-
-    mapping(uint256 => int256) public targetPrices;
-    mapping(uint256 => int256) public decayConstants;
+    // maps variable Id to decay constant
+    mapping(uint256 => int256) public decayConstant;
 
     /// @notice Sets target price and per time unit price decay for the VRGDA.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
     /// @param _priceDecayPercent The percent price decays per unit of time with no sales, scaled by 1e18.
-    constructor(int256 _targetPrice, int256 _priceDecayPercent) {
-        targetPrice = _targetPrice;
-
-        decayConstant = wadLn(1e18 - _priceDecayPercent);
-
-        // The decay constant must be negative for VRGDAs to work.
-        require(decayConstant < 0, "NON_NEGATIVE_DECAY_CONSTANT");
-    }
-
     function createVRGDA(int256 _targetPrice, int256 _priceDecayPercent) public {
-        targetPrices[varCounter] = _targetPrice;
+        targetPrice[varCounter] = _targetPrice;
         int256 _decayConstant = wadLn(1e18 - _priceDecayPercent);
         require(_decayConstant < 0, "NON_NEGATIVE_DECAY_CONSTANT");
-        decayConstants[varCounter] = _decayConstant;
+        decayConstant[varCounter] = _decayConstant;
         
         unchecked { varCounter++; }
     }
@@ -54,27 +45,13 @@ abstract contract VRGDA {
     /// @param timeSinceStart Time passed since the VRGDA began, scaled by 1e18.
     /// @param sold The total number of tokens that have been sold so far.
     /// @return The price of a token according to VRGDA, scaled by 1e18.
-    function getVRGDAPrice(int256 timeSinceStart, uint256 sold) public view returns (uint256) {
-        return VRGDALibrary.getVRGDAPrice(targetPrice, decayConstant, timeSinceStart - getTargetSaleTime(toWadUnsafe(sold + 1)));
-    }
-
     function getVRGDAPrice(uint256 varId, int256 timeSinceStart, uint256 sold) public view returns (uint256) {
-        unchecked {
-            // prettier-ignore
-            return uint256(wadMul(targetPrices[varId], wadExp(unsafeWadMul(decayConstants[varId],
-                // Theoretically calling toWadUnsafe with sold can silently overflow but under
-                // any reasonable circumstance it will never be large enough. We use sold + 1 as
-                // the VRGDA formula's n param represents the nth token and sold is the n-1th token.
-                timeSinceStart - getTargetSaleTime(varId, toWadUnsafe(sold + 1))
-            ))));
-        }
+        return VRGDALibrary.getVRGDAPrice(targetPrice[varId], decayConstant[varId], timeSinceStart - getTargetSaleTime(varId, toWadUnsafe(sold + 1)));
     }
 
     /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
     /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
     /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getTargetSaleTime(int256 sold) public view virtual returns (int256);
-
     function getTargetSaleTime(uint256 varId, int256 sold) public view virtual returns (int256);
 }

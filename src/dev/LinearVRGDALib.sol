@@ -43,7 +43,7 @@ library LinearVRGDALib {
         returns (uint256)
     {
         int256 timeDelta = getTargetSaleTime(self.perTimeUnit, sold);
-        // alternative syntax: self.vrgda.getVRGDAPrice(timeDelta);  (uses more gas though)
+        
         return VRGDALib.getVRGDAPrice(self.vrgda.targetPrice, self.vrgda.decayConstant, timeDelta);
     }
 

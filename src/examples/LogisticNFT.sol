@@ -72,7 +72,6 @@ contract LogisticNFT is ERC721 {
 
         unchecked {
             // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-<<<<<<< HEAD
             uint256 price = LogisticVRGDA.getVRGDAPrice(
                 toDaysWadUnsafe(block.timestamp - startTime),
                 targetPrice,
@@ -81,9 +80,6 @@ contract LogisticNFT is ERC721 {
                 timeScale,
                 mintedId = totalSold++
             );
-=======
-            uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
->>>>>>> 8e820a76fe37253f0a5b14dfeea7c07072b305c4
 
             require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

@@ -20,9 +20,9 @@ contract MultiNFT is ERC721, MultiVRGDA {
 
     uint256 public totalSold; // The total number of tokens sold so far.
 
-    uint256 public immutable startTime = block.timestamp; // When VRGDA sales begun.
+    uint256 public immutable startTime = block.timestamp; // When Linear VRGDA sales begin.
 
-    uint256 public immutable publicStartTime = block.timestamp + 30 days; // When VRGDA sales are public.
+    uint256 public immutable publicStartTime = block.timestamp + 30 days; // When Logistic VRGDA sales begin.
 
     // -- VRGDA Objects --
     VRGDAx internal presaleVRGDA;
@@ -101,15 +101,15 @@ contract MultiNFT is ERC721, MultiVRGDA {
 
     function mint() external payable returns (uint256 mintedId) {
         unchecked {
-            // conditionally set based on time / VRGDA
+            // conditionally set price based on time + VRGDA
             // i.e. if time < publicStartTime use presaleVRGDA else use publicVRGDA
             uint256 price;
 
             // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
             if (block.timestamp < publicStartTime) {
-                price = getPrice(presaleVRGDA, toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+                price = getVRGDAPrice(presaleVRGDA, toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
             } else {
-                price = getPrice(publicVRGDA, toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+                price = getVRGDAPrice(publicVRGDA, toDaysWadUnsafe(block.timestamp - publicStartTime), mintedId = totalSold++);
             }
 
             require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.

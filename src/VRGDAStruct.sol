@@ -7,7 +7,6 @@ import {VRGDALibrary} from "./lib/VRGDALibrary.sol";
 struct VRGDAx {
     int256 targetPrice;
     int256 decayConstant;
-    function (int256, int256, int256, uint256) view returns (uint256) getVRGDAPrice;
     function (int256) view returns (int256) getTargetSaleTime;
 }
 
@@ -38,7 +37,6 @@ abstract contract MultiVRGDA {
         vrgda = VRGDAx(
             _targetPrice,
             _decayConstant,
-            getVRGDAPrice,
             getTargetSaleTime
         );
     }
@@ -48,20 +46,21 @@ abstract contract MultiVRGDA {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Calculate the price of a token according to the VRGDA formula.
+    /// @param vrgda a VRGDAx struct representing a VRGDA instance
     /// @param timeSinceStart Time passed since the VRGDA began, scaled by 1e18.
     /// @param sold The total number of tokens that have been sold so far.
-    /// @return The price of a token according to VRGDA, scaled by 1e18.
-    function getVRGDAPrice(int256 targetPrice, int256 decayConstant, int256 timeSinceStart, uint256 sold) public view returns (uint256) {
-        return VRGDALibrary.getVRGDAPrice(targetPrice, decayConstant, timeSinceStart - getTargetSaleTime(toWadUnsafe(sold + 1)));
+    /// @return uint256 the price of a token according to VRGDA, scaled by 1e18.
+    function getVRGDAPrice(VRGDAx memory vrgda, int256 timeSinceStart, uint256 sold) internal view returns (uint256) {
+        return VRGDALibrary.getVRGDAPrice(
+            vrgda.targetPrice,
+            vrgda.decayConstant,
+            timeSinceStart - vrgda.getTargetSaleTime(toWadUnsafe(sold + 1))
+        );
     }
 
     /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
     /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
-    /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
+    /// @return int256 The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
     function getTargetSaleTime(int256 sold) public view virtual returns (int256);
-
-    function getPrice(VRGDAx memory vrgda, int256 timeSinceStart, uint256 sold) internal view returns (uint256) {
-        return vrgda.getVRGDAPrice(vrgda.targetPrice, vrgda.decayConstant, timeSinceStart, sold);
-    }
 }

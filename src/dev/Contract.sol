@@ -2,40 +2,42 @@
 pragma solidity >=0.8.0;
 
 import {LinearVRGDALib, LinearVRGDAx} from "./LinearVRGDALib.sol";
+import {LogisticVRGDALib, LogisticVRGDAx} from "./LogisticVRGDALib.sol";
 
 contract Contract {
     using LinearVRGDALib for LinearVRGDAx;
+    using LogisticVRGDALib for LogisticVRGDAx;
 
     int256 resourceA;
     int256 resourceB;
 
-    LinearVRGDAx internal vrgdaA;
-    LinearVRGDAx internal vrgdaB;
+    LinearVRGDAx internal linearAuction;
+    LogisticVRGDAx internal logAuction;
 
     constructor () {
-        vrgdaA = LinearVRGDALib.createLinearVRGDA(1e18, 0.2e18, 1e18);
-        vrgdaB = LinearVRGDALib.createLinearVRGDA(0.5e18, 0.2e18, 2e18);
+        linearAuction = LinearVRGDALib.createLinearVRGDA(1e18, 0.2e18, 1e18);
+        logAuction = LogisticVRGDALib.createLogisticVRGDA(1e18, 0.2e18, 100e18, 100e18);
     }
 
-    function buyA(uint256 amount) public payable {
-        uint256 price = vrgdaA.getVRGDAPrice(resourceA);
+    function buyLinear(uint256 amount) public payable {
+        uint256 price = linearAuction.getVRGDAPrice(resourceA);
         require(msg.value >= (price * amount), "Not enough ETH");
         
         resourceA += int256(amount);
     }
 
-    function buyB(uint256 amount) public payable {
-        uint256 price = vrgdaB.getVRGDAPrice(resourceB);
+    function buyLogistic(uint256 amount) public payable {
+        uint256 price = logAuction.getVRGDAPrice(resourceB);
         require(msg.value >= (price * amount), "Not enough ETH");
         
         resourceB += int256(amount);
     }
 
-    function getPriceA() public view returns (uint256) {
-        return vrgdaA.getVRGDAPrice(resourceA);
+    function getPriceLinear() public view returns (uint256) {
+        return linearAuction.getVRGDAPrice(resourceA);
     }
 
-    function getPriceB() public view returns (uint256) {
-        return vrgdaB.getVRGDAPrice(resourceB);
+    function getPriceLogistic() public view returns (uint256) {
+        return logAuction.getVRGDAPrice(resourceB);
     }
 }

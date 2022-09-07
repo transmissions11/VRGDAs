@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-// import {LinearVRGDA, VRGDA} from "../../src/LinearVRGDA.sol";
 import {LinearVRGDA} from "../../src/LinearVRGDA.sol";
 
 contract MockLinearVRGDA {

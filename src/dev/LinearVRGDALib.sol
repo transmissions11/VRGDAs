@@ -29,8 +29,10 @@ library LinearVRGDALib {
         int256 _priceDecayPercent,
         int256 _perTimeUnit
     ) internal pure returns (LinearVRGDAx memory linearVRGDA) {
-        VRGDAx memory vrgda = VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent);
-        linearVRGDA = LinearVRGDAx(_perTimeUnit, vrgda);
+        linearVRGDA = LinearVRGDAx(
+            _perTimeUnit,
+            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent)
+        );
     }
 
     /*//////////////////////////////////////////////////////////////

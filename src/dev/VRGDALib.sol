@@ -48,4 +48,8 @@ library VRGDALib {
             ));
         }
     }
+
+    function getVRGDAPrice(VRGDAx memory self, int256 timeDelta) internal pure returns (uint256) {
+        return getVRGDAPrice(self.targetPrice, self.decayConstant, timeDelta);
+    }
 }

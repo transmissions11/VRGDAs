@@ -16,6 +16,7 @@ struct LinearVRGDAx {
 /// @author saucepoint
 /// @notice VRGDA with a linear issuance curve.
 library LinearVRGDALib {
+    using VRGDALib for VRGDAx;
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/
@@ -42,15 +43,16 @@ library LinearVRGDALib {
         pure
         returns (uint256)
     {
-        int256 timeDelta = getTargetSaleTime(self, sold);
-        return VRGDALib.getVRGDAPrice(self.vrgda.targetPrice, self.vrgda.decayConstant, timeDelta);
+        int256 timeDelta = getTargetSaleTime(self.perTimeUnit, sold);
+        // alternative syntax: VRGDALib.getVRGDAPrice(self.vrgda.targetPrice, self.vrgda.decayConstant, timeDelta);
+        return self.vrgda.getVRGDAPrice(timeDelta);
     }
 
     /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
     /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
     /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getTargetSaleTime(LinearVRGDAx memory vrgda, int256 sold) internal pure returns (int256) {
-        return unsafeWadDiv(sold, vrgda.perTimeUnit);
+    function getTargetSaleTime(int256 perTimeUnit, int256 sold) internal pure returns (int256) {
+        return unsafeWadDiv(sold, perTimeUnit);
     }
 }

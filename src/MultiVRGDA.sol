@@ -4,6 +4,22 @@ pragma solidity >=0.8.0;
 import {wadExp, wadLn, wadMul, unsafeWadMul, toWadUnsafe} from "./utils/SignedWadMath.sol";
 import {VRGDALibrary} from "./lib/VRGDALibrary.sol";
 
+/// -----------------------------------------------------------------
+/// NOTE: this is what a multi-VRGDA via state would look like
+/// Most likely gonna trash this, but leaving it for reference & discussion
+/// 
+/// Pros:
+///  * abstract contract with flexibility to create multiple VRGDA instances
+///  * identifies a VRGDA via a unique id
+///  * single devex for creating VRGDA instances (createVRGDA)
+///  * getTargetSaleTime can condition on `varId` to allow for independent logic per VRGDA
+///
+/// Cons:
+///  * uses state, which i know you didn't like
+///  * assume LinearVRGDA and LogisiticVRGDA inherits MultiVRGDA, a contract cannot inherit from both Linear & Logistic
+///  * getTargetSaleTime will likely devolve into an ugly switch statement
+///  * devs need to keep track of VRGDA ids. i.e. VRGDA id=0 is resource x and id=1 is resource y
+
 /// @title Variable Rate Gradual Dutch Auction
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>

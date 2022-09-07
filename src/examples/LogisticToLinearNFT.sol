@@ -22,7 +22,7 @@ contract LogisticToLinearNFT is ERC721, LogisticToLinearVRGDA {
     /// @dev Represented as an 18 decimal fixed point number.
     int256 internal constant SWITCH_DAY_WAD = 233e18;
 
-    /// @notice The minimum amount of pages that must be sold for the VRGDA issuance
+    /// @notice The minimum amount of tokens that must be sold for the VRGDA issuance
     /// schedule to switch from logistic to the "post switch" translated linear formula.
     /// @dev Computed off-chain by plugging SWITCH_DAY_WAD into the uninverted pacing formula.
     /// @dev Represented as an 18 decimal fixed point number.
@@ -52,7 +52,7 @@ contract LogisticToLinearNFT is ERC721, LogisticToLinearVRGDA {
             0.014e18, // Logistic time scale.
             SOLD_BY_SWITCH_WAD, // Sold by switch.
             SWITCH_DAY_WAD, // Target switch day.
-            9e18 // Pages to target per day.
+            9e18 // Sales to target per day.
         )
     {}
 

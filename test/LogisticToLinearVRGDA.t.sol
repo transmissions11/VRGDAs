@@ -24,7 +24,7 @@ contract LogisticToLinearVRGDATest is DSTestPlus {
             0.014e18, // Logistic time scale.
             SOLD_BY_SWITCH_WAD, // Sold by switch.
             SWITCH_DAY_WAD, // Target switch day.
-            9e18 // Pages to target per day.
+            9e18 // Tokens to target per day.
         );
     }
 
@@ -37,16 +37,16 @@ contract LogisticToLinearVRGDATest is DSTestPlus {
     }
 
     function testSwitchSmoothness() public {
-        uint256 switchPageSaleTime = uint256(vrgda.getTargetSaleTime(8337e18) - vrgda.getTargetSaleTime(8336e18));
+        uint256 switchTokenSaleTime = uint256(vrgda.getTargetSaleTime(8337e18) - vrgda.getTargetSaleTime(8336e18));
 
         assertRelApproxEq(
             uint256(vrgda.getTargetSaleTime(8336e18) - vrgda.getTargetSaleTime(8335e18)),
-            switchPageSaleTime,
+            switchTokenSaleTime,
             0.0005e18
         );
 
         assertRelApproxEq(
-            switchPageSaleTime,
+            switchTokenSaleTime,
             uint256(vrgda.getTargetSaleTime(8338e18) - vrgda.getTargetSaleTime(8337e18)),
             0.005e18
         );

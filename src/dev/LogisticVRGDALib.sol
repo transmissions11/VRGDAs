@@ -15,13 +15,10 @@ struct LogisticVRGDAx {
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @author saucepoint
-/// @notice VRGDA with a linear issuance curve.
+/// @notice VRGDA with a logistic issuance curve.
 library LogisticVRGDALib {
-    /*//////////////////////////////////////////////////////////////
-                           PRICING PARAMETERS
-    //////////////////////////////////////////////////////////////*/
 
-    /// @notice Sets pricing parameters for the VRGDA.
+    /// @notice Create a Logistic VRGDA using specified parameters.
     /// @param _targetPrice The target price for a token if sold on pace, scaled by 1e18.
     /// @param _priceDecayPercent The percent price decays per unit of time with no sales, scaled by 1e18.
     /// @param _maxSellable The maximum number of tokens to sell, scaled by 1e18.
@@ -43,19 +40,28 @@ library LogisticVRGDALib {
                               PRICING LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function getVRGDAPrice(LogisticVRGDAx memory self, int256 sold)
+    /// @notice Calculate the price of a token according to the VRGDA formula.
+    /// @param self a VRGDA represented as the LinearVRGDAx struct
+    /// @param timeSinceStart Units of time passed since the VRGDA began, scaled by 1e18.
+    /// @param sold The number of tokens sold so far, scaled by 1e18.
+    /// @return uint256 The price of a token according to VRGDA, scaled by 1e18.
+    function getVRGDAPrice(LogisticVRGDAx memory self, int256 timeSinceStart, int256 sold)
         internal
         pure
         returns (uint256)
     {
-        int256 timeDelta = getTargetSaleTime(self.logisticLimit, self.timeScale, sold);
-        
+        int256 timeDelta;
+        unchecked {
+            timeDelta = timeSinceStart - getTargetSaleTime(self.logisticLimit, self.timeScale, sold);
+        }
         return VRGDALib.getVRGDAPrice(self.vrgda.targetPrice, self.vrgda.decayConstant, timeDelta);
     }
 
     /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
+    /// @param logisticLimit The logistic limit (maximum number of tokens to sell), scaled by 1e18.
+    /// @param timeScale The steepness of the logistic curve, scaled by 1e18.
     /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
-    /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
+    /// @return int256 The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
     function getTargetSaleTime(int256 logisticLimit, int256 timeScale, int256 sold) internal pure returns (int256) {
         unchecked {

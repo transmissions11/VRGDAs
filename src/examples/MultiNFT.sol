@@ -48,32 +48,30 @@ contract MultiNFT is ERC721, MultiVRGDA {
         )
     {
         // -------------------------
-        // the VRGDA used in presale
+        // create a VRGDA to be used in presale
         // -------------------------
-        int256 targetPrice = 69.42e18;
-        int256 priceDecayPercent = 0.31e18;
-        perTimeUnit = 2e18;
-        presaleVRGDA = createVRGDA(targetPrice, priceDecayPercent);
+        presaleVRGDA = createVRGDA(69.42e18, 0.31e18);
+        perTimeUnit = 2e18;  // additional state variable used for presaleVRGDA.getTargetSaleTime (this.getTargetSaleTime)
 
         // -----------------------------
-        // the VRGDA used in public sale
+        // create a VRGDA to used in public sale
+        // note: we can reuse presaleVRGDA and overwrite the functions since they are used during different times
+        // however for the sake of example, let's define two independent VRGDAs
         // -----------------------------
-        targetPrice = 69.42e18;  // Target price
-        priceDecayPercent = 0.31e18;  // Price decay percent
+        publicVRGDA = createVRGDA(69.42e18, 0.31e18);
         
-        // Maximum # mintable/sellable
+        // Set additional state variables used for publicVRGDA.getTargetSaleTime (this.getLogisticTargetSaleTime)
         // Add 1 wad to make the limit inclusive of _maxSellable
         logisticLimit = toWadUnsafe(MAX_MINTABLE) + 1e18;
 
         // Scale by 2e18 to both double it and give it 36 decimals.
         logisticLimitDoubled = logisticLimit * 2e18;
         
-        timeScale = 0.1e18; // Time scale
-        
-        publicVRGDA = createVRGDA(targetPrice, priceDecayPercent);
-        // override the target sale time function
-        publicVRGDA.getTargetSaleTime = getLogisticTargetSaleTime;
+        // Time scale
+        timeScale = 0.1e18;
 
+        // override the target sale time function to use a logistic function
+        publicVRGDA.getTargetSaleTime = getLogisticTargetSaleTime;
     }
 
     /*//////////////////////////////////////////////////////////////

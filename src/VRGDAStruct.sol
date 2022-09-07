@@ -7,7 +7,7 @@ import {VRGDALibrary} from "./lib/VRGDALibrary.sol";
 struct VRGDAx {
     int256 targetPrice;
     int256 decayConstant;
-    function (int256, int256, int256, uint256) view returns (uint256) getPrice;
+    function (int256, int256, int256, uint256) view returns (uint256) getVRGDAPrice;
     function (int256) view returns (int256) getTargetSaleTime;
 }
 
@@ -62,6 +62,6 @@ abstract contract MultiVRGDA {
     function getTargetSaleTime(int256 sold) public view virtual returns (int256);
 
     function getPrice(VRGDAx memory vrgda, int256 timeSinceStart, uint256 sold) internal view returns (uint256) {
-        return vrgda.getPrice(vrgda.targetPrice, vrgda.decayConstant, timeSinceStart, sold);
+        return vrgda.getVRGDAPrice(vrgda.targetPrice, vrgda.decayConstant, timeSinceStart, sold);
     }
 }

@@ -1,4 +1,8 @@
 // SPDX-License-Identifier: MIT
+
+/// NOTE: an example contract that inherits MultiVRGDA
+/// which will be likely trashed. included for discussion & reference
+
 pragma solidity >=0.8.0;
 import {wadExp, wadLn, wadMul, unsafeWadMul, toWadUnsafe, unsafeWadDiv} from "../../src/utils/SignedWadMath.sol";
 import {VRGDALibrary} from "../../src/lib/VRGDALibrary.sol";

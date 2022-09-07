@@ -82,43 +82,4 @@ contract LogisticVRGDATest is DSTestPlus {
             0.00001e18
         );
     }
-
-    function testTargetPriceCreated() public {
-        uint256 varId = vrgda.createLogisticVRGDA(
-            69.42e18, // Target price.
-            0.31e18, // Price decay percent.
-            toWadUnsafe(MAX_SELLABLE), // Max sellable.
-            0.0023e18 // Time scale.
-        );
-        assertEq(varId, 0);
-        
-        // Warp to the target sale time so that the VRGDA price equals the target price.
-        hevm.warp(block.timestamp + fromDaysWadUnsafe(vrgda.getTargetSaleTime(varId, 1e18)));
-
-        uint256 cost = vrgda.getVRGDAPrice(varId, toDaysWadUnsafe(block.timestamp), 0);
-        assertRelApproxEq(cost, uint256(vrgda.targetPrices(varId)), 0.0000001e18);
-    }
-
-    function testPricingBasicCreated() public {
-        // create an unused VRGDA so we can test the second one behaves as expected
-        vrgda.createLogisticVRGDA(0, 1, 0, 0);
-        uint256 varId = vrgda.createLogisticVRGDA(
-            69.42e18, // Target price.
-            0.31e18, // Price decay percent.
-            toWadUnsafe(MAX_SELLABLE), // Max sellable.
-            0.0023e18 // Time scale.
-        );
-        assertEq(varId, 1);
-
-        // Our VRGDA targets this number of mints at given time.
-        uint256 timeDelta = 120 days;
-        uint256 numMint = 876;
-
-        hevm.warp(block.timestamp + timeDelta);
-
-        uint256 cost = vrgda.getVRGDAPrice(varId, toDaysWadUnsafe(block.timestamp), numMint);
-
-        // Equal within 2 percent since num mint is rounded from true decimal amount.
-        assertRelApproxEq(cost, uint256(vrgda.targetPrices(varId)), 0.02e18);
-    }
 }

@@ -13,7 +13,7 @@ import {LinearVRGDA} from "../LinearVRGDA.sol";
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice Example NFT sold using LinearVRGDA.
 /// @dev This is an example. Do not use in production.
-contract LinearNFT is ERC721, LinearVRGDA {
+contract LinearNFT is ERC721 {
     /*//////////////////////////////////////////////////////////////
                               SALES STORAGE
     //////////////////////////////////////////////////////////////*/
@@ -21,6 +21,21 @@ contract LinearNFT is ERC721, LinearVRGDA {
     uint256 public totalSold; // The total number of tokens sold so far.
 
     uint256 public startTime = block.timestamp; // When VRGDA sales begun.
+
+    /*//////////////////////////////////////////////////////////////
+                           PRICING PARAMETERS
+    //////////////////////////////////////////////////////////////*/
+
+    /// @dev The total number of tokens to target selling every full unit of time.
+    /// @dev Represented as an 18 decimal fixed point number.
+    int256 internal immutable perTimeUnit;
+
+    /// @dev The percent price decays per unit of time with no sales, scaled by 1e18
+    int256 internal immutable priceDecayPercent;
+
+    /// @notice Target price for a token, to be scaled according to sales pace.
+    /// @dev Represented as an 18 decimal fixed point number.
+    int256 public immutable targetPrice;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -31,12 +46,11 @@ contract LinearNFT is ERC721, LinearVRGDA {
             "Example Linear NFT", // Name.
             "LINEAR" // Symbol.
         )
-        LinearVRGDA(
-            69.42e18, // Target price.
-            0.31e18, // Price decay percent.
-            2e18 // Per time unit.
-        )
-    {}
+    {
+        targetPrice = 69.42e18;
+        priceDecayPercent = 0.31e18;
+        perTimeUnit = 2e18;
+    }
 
     /*//////////////////////////////////////////////////////////////
                               MINTING LOGIC
@@ -45,7 +59,13 @@ contract LinearNFT is ERC721, LinearVRGDA {
     function mint() external payable returns (uint256 mintedId) {
         unchecked {
             // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-            uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+            uint256 price = LinearVRGDA.getVRGDAPrice(
+                toDaysWadUnsafe(block.timestamp - startTime),
+                targetPrice,
+                priceDecayPercent,
+                perTimeUnit,
+                mintedId = totalSold++
+            );
 
             require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

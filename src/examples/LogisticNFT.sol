@@ -13,7 +13,7 @@ import {LogisticVRGDA} from "../LogisticVRGDA.sol";
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice Example NFT sold using LogisticVRGDA.
 /// @dev This is an example. Do not use in production.
-contract LogisticNFT is ERC721, LogisticVRGDA {
+contract LogisticNFT is ERC721 {
     /*//////////////////////////////////////////////////////////////
                                 CONSTANTS
     //////////////////////////////////////////////////////////////*/
@@ -29,6 +29,24 @@ contract LogisticNFT is ERC721, LogisticVRGDA {
     uint256 public startTime = block.timestamp; // When VRGDA sales begun.
 
     /*//////////////////////////////////////////////////////////////
+                           PRICING PARAMETERS
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Target price for a token, to be scaled according to sales pace.
+    /// @dev Represented as an 18 decimal fixed point number.
+    int256 public immutable targetPrice;
+
+    /// @dev The steepness of the logistic curve, scaled by 1e18.
+    int256 internal immutable timeScale;
+
+    /// @dev The percent price decays per unit of time with no sales, scaled by 1e18
+    int256 internal immutable priceDecayPercent;
+
+    /// @notice The maximum number of tokens to sell, scaled by 1e18.
+    /// @dev Used to calculate logisticLimit and logisticLimitDoubled.
+    int256 public immutable maxSellable;
+
+    /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
@@ -37,14 +55,12 @@ contract LogisticNFT is ERC721, LogisticVRGDA {
             "Example Logistic NFT", // Name.
             "LOGISTIC" // Symbol.
         )
-        LogisticVRGDA(
-            69.42e18, // Target price.
-            0.31e18, // Price decay percent.
-            // Maximum # mintable/sellable.
-            toWadUnsafe(MAX_MINTABLE),
-            0.1e18 // Time scale.
-        )
-    {}
+    {
+        targetPrice = 69.42e18;
+        priceDecayPercent = 0.31e18;
+        maxSellable = toWadUnsafe(MAX_MINTABLE);
+        timeScale = 0.1e18;
+    }
 
     /*//////////////////////////////////////////////////////////////
                               MINTING LOGIC
@@ -56,7 +72,14 @@ contract LogisticNFT is ERC721, LogisticVRGDA {
 
         unchecked {
             // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-            uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+            uint256 price = LogisticVRGDA.getVRGDAPrice(
+                toDaysWadUnsafe(block.timestamp - startTime),
+                targetPrice,
+                priceDecayPercent,
+                maxSellable,
+                timeScale,
+                mintedId = totalSold++
+            );
 
             require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

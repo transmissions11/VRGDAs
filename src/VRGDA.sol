@@ -40,7 +40,7 @@ abstract contract VRGDA {
     /// @param timeSinceStart Time passed since the VRGDA began, scaled by 1e18.
     /// @param sold The total number of tokens that have been sold so far.
     /// @return The price of a token according to VRGDA, scaled by 1e18.
-    function getVRGDAPrice(int256 timeSinceStart, uint256 sold) public view returns (uint256) {
+    function getVRGDAPrice(int256 timeSinceStart, uint256 sold) public view virtual returns (uint256) {
         unchecked {
             // prettier-ignore
             return uint256(wadMul(targetPrice, wadExp(unsafeWadMul(decayConstant,

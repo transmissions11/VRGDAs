@@ -8,13 +8,13 @@ contract MockLogisticVRGDA {
     LogisticVRGDAx internal logAuction;
     constructor(
         int256 _targetPrice,
-        int256 _priceDecreasePercent,
+        int256 _priceDecayPercent,
         int256 _maxSellable,
         int256 _timeScale
     ) {
         logAuction = LogisticVRGDALib.createLogisticVRGDA(
             _targetPrice,
-            _priceDecreasePercent,
+            _priceDecayPercent,
             _maxSellable,
             _timeScale
         );

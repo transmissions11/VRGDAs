@@ -32,7 +32,7 @@ contract LogisticVRGDATest is DSTestPlus {
     }
 
     function testPricingBasic() public {
-        // Our VRGDA targets this number of mints at given time.
+        // Our VRGDA targets this number of mints at the given time.
         uint256 timeDelta = 120 days;
         uint256 numMint = 876;
 

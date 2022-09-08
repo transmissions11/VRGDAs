@@ -9,12 +9,12 @@ contract MockLinearVRGDA {
 
     constructor(
         int256 _targetPrice,
-        int256 _priceDecreasePercent,
+        int256 _priceDecayPercent,
         int256 _perTimeUnit
     ) {
         linearAuction = LinearVRGDALib.createLinearVRGDA(
             _targetPrice,
-            _priceDecreasePercent,
+            _priceDecayPercent,
             _perTimeUnit
         );
     }

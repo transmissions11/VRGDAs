@@ -7,12 +7,12 @@ import {LogisticVRGDALib} from "../../LogisticVRGDALib.sol";
 import {VRGDALib, VRGDAx} from "../../VRGDALib.sol";
 
 struct LogisticToLinearVRGDAx {
+    VRGDAx vrgda;
     int256 logisticLimit;
     int256 timeScale;
     int256 soldBySwitch;
     int256 switchTime;
     int256 perTimeUnit;
-    VRGDAx vrgda;
 }
 
 /// @title Linear Variable Rate Gradual Dutch Auction
@@ -36,12 +36,12 @@ library LogisticToLinearVRGDALib {
         int256 _perTimeUnit
     ) internal pure returns (LogisticToLinearVRGDAx memory logToLinearVRGDA) {
         logToLinearVRGDA = LogisticToLinearVRGDAx(
+            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent),
             _logisticAsymptote + 1e18,  // add 1 wad to make the limit inclusive
             _timeScale,
             _soldBySwitch,
             _switchTime,
-            _perTimeUnit,
-            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent)
+            _perTimeUnit
         );
     }
 

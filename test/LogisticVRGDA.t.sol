@@ -3,7 +3,7 @@ pragma solidity 0.8.15;
 
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
-import {toWadUnsafe, toDaysWadUnsafe, fromDaysWadUnsafe} from "../src/utils/SignedWadMath.sol";
+import {toWadUnsafe, toDaysWadUnsafe, fromDaysWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 
 import {MockLogisticVRGDA} from "./mocks/MockLogisticVRGDA.sol";
 

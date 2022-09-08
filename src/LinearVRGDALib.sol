@@ -6,8 +6,8 @@ import {unsafeWadDiv, toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 import {VRGDALib, VRGDAx} from "./VRGDALib.sol";
 
 struct LinearVRGDAx {
-    int256 perTimeUnit;
     VRGDAx vrgda;
+    int256 perTimeUnit;
 }
 
 /// @title Linear Variable Rate Gradual Dutch Auction
@@ -28,8 +28,8 @@ library LinearVRGDALib {
         int256 _perTimeUnit
     ) internal pure returns (LinearVRGDAx memory linearVRGDA) {
         linearVRGDA = LinearVRGDAx(
-            _perTimeUnit,
-            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent)
+            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent),
+            _perTimeUnit
         );
     }
 

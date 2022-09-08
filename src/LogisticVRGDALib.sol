@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {wadLn, unsafeDiv, unsafeWadDiv, toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
+import {wadMul, wadLn, unsafeDiv, unsafeWadDiv, toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 
 import {VRGDALib, VRGDAx} from "./VRGDALib.sol";
 
 struct LogisticVRGDAx {
+    VRGDAx vrgda;
     int256 logisticLimit;
     int256 timeScale;
-    VRGDAx vrgda;
 }
 
 /// @title Logistic Variable Rate Gradual Dutch Auction
@@ -30,9 +30,9 @@ library LogisticVRGDALib {
         int256 _timeScale
     ) internal pure returns (LogisticVRGDAx memory logisticVRGDAx) {
         logisticVRGDAx = LogisticVRGDAx(
+            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent),
             _maxSellable + 1e18,  // add 1 wad to make the limit inclusive of _maxSellable
-            _timeScale,
-            VRGDALib.createVRGDA(_targetPrice, _priceDecayPercent)
+            _timeScale
         );
     }
 

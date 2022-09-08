@@ -2,7 +2,7 @@
 pragma solidity 0.8.15;
 
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
-import {fromDaysWadUnsafe} from "../src/utils/SignedWadMath.sol";
+import {fromDaysWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 import {MultiNFT} from "../src/examples/MultiNFT.sol";
 
 contract MultiNFTTest is DSTestPlus {

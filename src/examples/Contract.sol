@@ -3,7 +3,7 @@ pragma solidity >=0.8.0;
 
 import {LinearVRGDALib, LinearVRGDAx} from "../LinearVRGDALib.sol";
 import {LogisticVRGDALib, LogisticVRGDAx} from "../LogisticVRGDALib.sol";
-import {toWadUnsafe} from "../utils/SignedWadMath.sol";
+import {toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 
 contract Contract {
     using LinearVRGDALib for LinearVRGDAx;

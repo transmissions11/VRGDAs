@@ -4,7 +4,7 @@ pragma solidity 0.8.15;
 import {DSTestPlus} from "solmate/test/utils/DSTestPlus.sol";
 
 import {MockLinearVRGDA} from "../mocks/MockLinearVRGDA.sol";
-import {toWadUnsafe} from "../../src/utils/SignedWadMath.sol";
+import {toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 import {console} from "forge-std/console.sol";
 import {Vm} from "forge-std/Vm.sol";
 

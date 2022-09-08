@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import {ERC721} from "solmate/tokens/ERC721.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
-import {toDaysWadUnsafe, toWadUnsafe} from "../utils/SignedWadMath.sol";
+import {toDaysWadUnsafe, toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 
 import {LogisticVRGDA} from "../LogisticVRGDA.sol";
 

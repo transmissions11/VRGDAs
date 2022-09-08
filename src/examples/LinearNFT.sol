@@ -4,16 +4,17 @@ pragma solidity >=0.8.0;
 import {ERC721} from "solmate/tokens/ERC721.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
-import {toDaysWadUnsafe} from "../utils/SignedWadMath.sol";
+import {toDaysWadUnsafe, toWadUnsafe} from "../utils/SignedWadMath.sol";
 
-import {LinearVRGDA} from "../LinearVRGDA.sol";
+import {LinearVRGDALib, LinearVRGDAx} from "../LinearVRGDALib.sol";
 
 /// @title Linear VRGDA NFT
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice Example NFT sold using LinearVRGDA.
 /// @dev This is an example. Do not use in production.
-contract LinearNFT is ERC721, LinearVRGDA {
+contract LinearNFT is ERC721 {
+    using LinearVRGDALib for LinearVRGDAx;
     /*//////////////////////////////////////////////////////////////
                               SALES STORAGE
     //////////////////////////////////////////////////////////////*/
@@ -21,6 +22,8 @@ contract LinearNFT is ERC721, LinearVRGDA {
     uint256 public totalSold; // The total number of tokens sold so far.
 
     uint256 public immutable startTime = block.timestamp; // When VRGDA sales begun.
+
+    LinearVRGDAx public vrgda; // The VRGDA used to price the NFT.
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -31,12 +34,13 @@ contract LinearNFT is ERC721, LinearVRGDA {
             "Example Linear NFT", // Name.
             "LINEAR" // Symbol.
         )
-        LinearVRGDA(
+    {
+        vrgda = LinearVRGDALib.createLinearVRGDA(
             69.42e18, // Target price.
             0.31e18, // Price decay percent.
             2e18 // Per time unit.
-        )
-    {}
+        );
+    }
 
     /*//////////////////////////////////////////////////////////////
                               MINTING LOGIC
@@ -45,7 +49,7 @@ contract LinearNFT is ERC721, LinearVRGDA {
     function mint() external payable returns (uint256 mintedId) {
         unchecked {
             // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-            uint256 price = getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+            uint256 price = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
 
             require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.
 

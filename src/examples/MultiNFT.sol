@@ -6,14 +6,17 @@ import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
 import {toDaysWadUnsafe, toWadUnsafe, unsafeWadDiv, wadLn, unsafeDiv} from "../utils/SignedWadMath.sol";
 
-import {MultiVRGDA, VRGDAx} from "../VRGDAStruct.sol";
+import {LinearVRGDALib, LinearVRGDAx} from "../LinearVRGDALib.sol";
+import {LogisticVRGDALib, LogisticVRGDAx} from "../LogisticVRGDALib.sol";
 
 /// @title Multi VRGDA NFT
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice Example NFT sold using BOTH Linear VRGDA and Logistic VRGDA.
 /// @dev This is an example. Do not use in production.
-contract MultiNFT is ERC721, MultiVRGDA {
+contract MultiNFT is ERC721 {
+    using LinearVRGDALib for LinearVRGDAx;
+    using LogisticVRGDALib for LogisticVRGDAx;
     /*//////////////////////////////////////////////////////////////
                               SALES STORAGE
     //////////////////////////////////////////////////////////////*/
@@ -25,17 +28,14 @@ contract MultiNFT is ERC721, MultiVRGDA {
     uint256 public immutable publicStartTime = block.timestamp + 30 days; // When Logistic VRGDA sales begin.
 
     // -- VRGDA Objects --
-    VRGDAx internal presaleVRGDA;
-    VRGDAx internal publicVRGDA;
+    LinearVRGDAx internal presaleVRGDA;
+    LogisticVRGDAx internal publicVRGDA;
 
     // -- Linear VRGDA Params --
     int256 public perTimeUnit;  // The number of tokens to target selling in 1 full unit of time, scaled by 1e18.
 
     // -- Logistic VRGDA Params --
     uint256 public constant MAX_MINTABLE = 100; // Max supply. for logistic VRGDA
-    int256 public immutable logisticLimit;
-    int256 public immutable logisticLimitDoubled;
-    int256 internal immutable timeScale;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -50,50 +50,24 @@ contract MultiNFT is ERC721, MultiVRGDA {
         // -------------------------
         // create a VRGDA to be used in presale
         // -------------------------
-        presaleVRGDA = createVRGDA(69.42e18, 0.31e18);
-        perTimeUnit = 2e18;  // additional state variable used for presaleVRGDA.getTargetSaleTime which points to this.getTargetSaleTime
+        presaleVRGDA = LinearVRGDALib.createLinearVRGDA(
+            69.42e18, // Target price.
+            0.31e18, // Price decay percent.
+            2e18  // 2 units sold per unit of time
+        );
 
         // -----------------------------
         // create a VRGDA to used in public sale
         // note: we can reuse presaleVRGDA and overwrite the .getTargetSaleTime since
         // they are used during different times. However for the sake of example, let's define two independent VRGDAs
         // -----------------------------
-        publicVRGDA = createVRGDA(69.42e18, 0.31e18);
-        
-        // Set additional state variables used for publicVRGDA.getTargetSaleTime which points to this.getLogisticTargetSaleTime
-        // Add 1 wad to make the limit inclusive of _maxSellable
-        logisticLimit = toWadUnsafe(MAX_MINTABLE) + 1e18;
-
-        // Scale by 2e18 to both double it and give it 36 decimals.
-        logisticLimitDoubled = logisticLimit * 2e18;
-        
-        // Time scale
-        timeScale = 0.1e18;
-
-        // override the target sale time function to use a logistic function
-        publicVRGDA.getTargetSaleTime = getLogisticTargetSaleTime;
-    }
-
-    /*//////////////////////////////////////////////////////////////
-                              VRGDA LOGIC
-    //////////////////////////////////////////////////////////////*/
-    /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.
-    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
-    /// @return int256 the target time the tokens should be sold by, scaled by 1e18, where the time is
-    /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getTargetSaleTime(int256 sold) public view override returns (int256) {
-        return unsafeWadDiv(sold, perTimeUnit);
-    }
-
-    /// @dev Logistic counterpart to the linear getTargetSaleTime
-    /// will be assigned to a VRGDAx's .getTargetSaleTime attribute
-    /// @param sold A number of tokens sold, scaled by 1e18, to get the corresponding target sale time for.
-    /// @return int256 The target time the tokens should be sold by, scaled by 1e18, where the time is
-    /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getLogisticTargetSaleTime(int256 sold) public view returns (int256) {
-        unchecked {
-            return -unsafeWadDiv(wadLn(unsafeDiv(logisticLimitDoubled, sold + logisticLimit) - 1e18), timeScale);
-        }
+        publicVRGDA = LogisticVRGDALib.createLogisticVRGDA(
+            69.42e18, // Target price.
+            0.31e18, // Price decay percent.
+            // Maximum # mintable/sellable.
+            toWadUnsafe(MAX_MINTABLE),
+            0.1e18 // Time scale.
+        );
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -102,15 +76,16 @@ contract MultiNFT is ERC721, MultiVRGDA {
 
     function mint() external payable returns (uint256 mintedId) {
         unchecked {
+            // mintedId = totalSold++;
             // conditionally set price based on time + VRGDA
             // i.e. if time < publicStartTime use presaleVRGDA else use publicVRGDA
             uint256 price;
 
             if (block.timestamp < publicStartTime) {
                 // Note: By using toDaysWadUnsafe(block.timestamp - startTime) we are establishing that 1 "unit of time" is 1 day.
-                price = getVRGDAPrice(presaleVRGDA, toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
+                price = presaleVRGDA.getVRGDAPrice(toDaysWadUnsafe(block.timestamp - startTime), mintedId = totalSold++);
             } else {
-                price = getVRGDAPrice(publicVRGDA, toDaysWadUnsafe(block.timestamp - publicStartTime), mintedId = totalSold++);
+                price = publicVRGDA.getVRGDAPrice(toDaysWadUnsafe(block.timestamp - publicStartTime), mintedId = totalSold++);
             }
 
             require(msg.value >= price, "UNDERPAID"); // Don't allow underpaying.

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {unsafeWadDiv} from "./utils/SignedWadMath.sol";
+import {unsafeWadDiv, toWadUnsafe} from "./utils/SignedWadMath.sol";
 
 import {VRGDALib, VRGDAx} from "./VRGDALib.sol";
 
@@ -42,14 +42,14 @@ library LinearVRGDALib {
     /// @param timeSinceStart Units of time passed since the VRGDA began, scaled by 1e18.
     /// @param sold The number of tokens sold so far, scaled by 1e18.
     /// @return uint256 The price of a token according to VRGDA, scaled by 1e18.
-    function getVRGDAPrice(LinearVRGDAx memory self, int256 timeSinceStart, int256 sold)
+    function getVRGDAPrice(LinearVRGDAx memory self, int256 timeSinceStart, uint256 sold)
         internal
         pure
         returns (uint256)
     {
         int256 timeDelta;
         unchecked {
-            timeDelta = timeSinceStart - getTargetSaleTime(self.perTimeUnit, sold);
+            timeDelta = timeSinceStart - getTargetSaleTime(self.perTimeUnit, toWadUnsafe(sold + 1));
         }
         return VRGDALib.getVRGDAPrice(self.vrgda.targetPrice, self.vrgda.decayConstant, timeDelta);
     }

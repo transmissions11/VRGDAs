@@ -12,8 +12,8 @@ contract Contract {
     uint256 startTime = block.timestamp;
 
     // dummy counters to represent "purchases"
-    int256 resourceA;  // priced via Linear VRGDA
-    int256 resourceB;  // priced via Logistic VRGDA
+    uint256 resourceA;  // priced via Linear VRGDA
+    uint256 resourceB;  // priced via Logistic VRGDA
 
     // define 2 VRGDAs to price the resources
     LinearVRGDAx internal linearAuction;
@@ -22,7 +22,7 @@ contract Contract {
     constructor () {
         // initialize the VRGDAs
         linearAuction = LinearVRGDALib.createLinearVRGDA(1e18, 0.2e18, 1e18);
-        logAuction = LogisticVRGDALib.createLogisticVRGDA(1e18, 0.2e18, 100e18, 100e18);
+        logAuction = LogisticVRGDALib.createLogisticVRGDA(1e18, 0.2e18, 1000e18, 1000e18);
     }
 
     // purchase resourceA, according to the linear VRGDA
@@ -31,7 +31,7 @@ contract Contract {
         uint256 price = linearAuction.getVRGDAPrice(timeSinceStart, resourceA);
         require(msg.value >= (price * amount), "Not enough ETH");
         
-        resourceA += int256(amount);
+        unchecked { resourceA += amount; }
     }
 
     // purchase resourceB, according to the logistic VRGDA
@@ -40,7 +40,7 @@ contract Contract {
         uint256 price = logAuction.getVRGDAPrice(timeSinceStart, resourceB);
         require(msg.value >= (price * amount), "Not enough ETH");
         
-        resourceB += int256(amount);
+        unchecked { resourceB += amount; }
     }
 
     // view function for getting the price of resourceA

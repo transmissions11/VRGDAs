@@ -56,19 +56,19 @@ contract LogisticVRGDATest is DSTestPlus {
     }
 
     function testNoOverflowForMostTokens(uint256 timeSinceStart, uint256 sold) public {
-        vrgda.getVRGDAPrice(int256(bound(timeSinceStart, 0 days, ONE_THOUSAND_YEARS * 1e18)), bound(sold, 0, 1730));
+        vrgda.getVRGDAPrice(toDaysWadUnsafe(bound(timeSinceStart, 0 days, ONE_THOUSAND_YEARS)), bound(sold, 0, 1730));
     }
 
     function testNoOverflowForAllTokens(uint256 timeSinceStart, uint256 sold) public {
         vrgda.getVRGDAPrice(
-            int256(bound(timeSinceStart, 3870 days * 1e18, ONE_THOUSAND_YEARS * 1e18)),
+            toDaysWadUnsafe(bound(timeSinceStart, 3870 days, ONE_THOUSAND_YEARS)),
             bound(sold, 0, 6391)
         );
     }
 
     function testFailOverflowForBeyondLimitTokens(uint256 timeSinceStart, uint256 sold) public {
         vrgda.getVRGDAPrice(
-            int256(bound(timeSinceStart, 0 days, ONE_THOUSAND_YEARS * 1e18)),
+            toDaysWadUnsafe(bound(timeSinceStart, 0 days, ONE_THOUSAND_YEARS)),
             bound(sold, 6392, type(uint128).max)
         );
     }

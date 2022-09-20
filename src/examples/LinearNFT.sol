@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import {ERC721} from "solmate/tokens/ERC721.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
-import {toDaysWadUnsafe} from "../utils/SignedWadMath.sol";
+import {toDaysWadUnsafe} from "solmate/utils/SignedWadMath.sol";
 
 import {LinearVRGDA} from "../LinearVRGDA.sol";
 
@@ -20,7 +20,7 @@ contract LinearNFT is ERC721, LinearVRGDA {
 
     uint256 public totalSold; // The total number of tokens sold so far.
 
-    uint256 public startTime = block.timestamp; // When VRGDA sales begun.
+    uint256 public immutable startTime = block.timestamp; // When VRGDA sales begun.
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR

@@ -1,3 +1,8 @@
+LinearBoundedVRGDATest:testAlwaysTargetPriceInRightConditions(uint256) (runs: 256, μ: 10293, ~: 10293)
+LinearBoundedVRGDATest:testPricingBasic() (gas: 10089)
+LinearBoundedVRGDATest:testPricingBasicMax() (gas: 9782)
+LinearBoundedVRGDATest:testPricingBasicMin() (gas: 9871)
+LinearBoundedVRGDATest:testTargetPrice() (gas: 10933)
 LinearNFTTest:testCannotUnderpayForNFTMint() (gas: 37841)
 LinearNFTTest:testMintManyNFT() (gas: 4177040)
 LinearNFTTest:testMintNFT() (gas: 83907)

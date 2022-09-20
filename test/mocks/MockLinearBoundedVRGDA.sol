@@ -11,9 +11,8 @@ contract MockLinearBoundedVRGDA is BoundedVRGDA {
         int256 _targetPrice,
         int256 _priceDecayPercent,
         uint256 _min,
-        uint256 _max,
         int256 _perTimeUnit
-    ) BoundedVRGDA(_targetPrice, _priceDecayPercent, _min, _max) {
+    ) BoundedVRGDA(_targetPrice, _priceDecayPercent, _min) {
         perTimeUnit = _perTimeUnit;
     }
 

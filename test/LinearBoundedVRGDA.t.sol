@@ -17,7 +17,6 @@ contract LinearBoundedVRGDATest is DSTestPlus {
             69.42e18, // Target price.
             0.31e18, // Price decay percent.
             1e18, // Min price
-            100e18, // Max price
             2e18 // Per time unit.
         );
     }
@@ -59,15 +58,5 @@ contract LinearBoundedVRGDATest is DSTestPlus {
 
         uint256 cost = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp), numMint);
         assertEq(cost, uint256(vrgda.min()));
-    }
-
-    function testPricingBasicMax() public {
-        uint256 timeDelta = 120 days;
-        uint256 numMint = 241;
-
-        hevm.warp(block.timestamp + timeDelta);
-
-        uint256 cost = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp), numMint);
-        assertEq(cost, uint256(vrgda.max()));
     }
 }

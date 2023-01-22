@@ -6,7 +6,6 @@ import {wadExp, wadLn, wadMul, unsafeWadMul, toWadUnsafe} from "solmate/utils/Si
 import {VRGDA} from "./VRGDA.sol";
 
 /// @title Bounded Variable Rate Gradual Dutch Auction
-/// @author jacopo <jacopo@slice.so>
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice Sell tokens roughly according to an issuance schedule.
@@ -16,7 +15,7 @@ abstract contract BoundedVRGDA is VRGDA {
                             VRGDA PARAMETERS
     //////////////////////////////////////////////////////////////*/
 
-    /// @dev The minimum price to be paid for a token, scaled by 1e18.
+    /// @dev The minimum sale price of a token.
     /// @dev Represented as an 18 decimal fixed point number.
     uint256 public immutable min;
 

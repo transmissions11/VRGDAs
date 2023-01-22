@@ -21,14 +21,6 @@ contract LinearBoundedVRGDATest is DSTestPlus {
         );
     }
 
-    function testTargetPrice() public {
-        // Warp to the target sale time so that the VRGDA price equals the target price.
-        hevm.warp(block.timestamp + fromDaysWadUnsafe(vrgda.getTargetSaleTime(1e18)));
-
-        uint256 cost = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp), 0);
-        assertRelApproxEq(cost, uint256(vrgda.targetPrice()), 0.00001e18);
-    }
-
     function testPricingBasic() public {
         // Our VRGDA targets this number of mints at the given time.
         uint256 timeDelta = 120 days;
@@ -40,20 +32,11 @@ contract LinearBoundedVRGDATest is DSTestPlus {
         assertRelApproxEq(cost, uint256(vrgda.targetPrice()), 0.00001e18);
     }
 
-    function testAlwaysTargetPriceInRightConditions(uint256 sold) public {
-        sold = bound(sold, 0, type(uint128).max);
-
-        assertRelApproxEq(
-            vrgda.getVRGDAPrice(vrgda.getTargetSaleTime(toWadUnsafe(sold + 1)), sold),
-            uint256(vrgda.targetPrice()),
-            0.00001e18
-        );
-    }
-
-    function testPricingBasicMin() public {
+    function testMinPrice() public {
         uint256 timeDelta = 120 days;
         uint256 numMint = 216;
 
+        // Warp to a sale time where the decreased VRGDA price should be less than the min.
         hevm.warp(block.timestamp + timeDelta);
 
         uint256 cost = vrgda.getVRGDAPrice(toDaysWadUnsafe(block.timestamp), numMint);

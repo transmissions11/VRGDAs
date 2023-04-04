@@ -44,7 +44,7 @@ abstract contract LogisticVRGDA is VRGDA {
         logisticLimit = _maxSellable + 1e18;
 
         // Scale by 2e18 to both double it and give it 36 decimals.
-        logisticLimitDoubled = logisticLimit * 2e18;
+        logisticLimitDoubled = (_maxSellable + 1e18) * 2e18;
 
         timeScale = _timeScale;
     }
